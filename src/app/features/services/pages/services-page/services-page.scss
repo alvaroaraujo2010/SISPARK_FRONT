@@ -1,0 +1,48 @@
+.services-shell {
+  padding: 2.5rem 0;
+}
+
+.services-shell__grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.services-copy,
+.services-form {
+  border-radius: 24px;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 18px 40px rgba(17, 29, 23, 0.08);
+}
+
+.services-copy span {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+  color: #0c7d46;
+  font-weight: 700;
+}
+
+.services-copy h1 {
+  font-size: clamp(2rem, 3vw, 3rem);
+  font-weight: 800;
+}
+
+.services-copy p {
+  color: var(--sp-muted);
+}
+
+.services-copy img {
+  width: 100%;
+  margin-top: 1rem;
+  border-radius: 18px;
+  object-fit: cover;
+}
+
+@media (max-width: 900px) {
+  .services-shell__grid {
+    grid-template-columns: 1fr;
+  }
+}

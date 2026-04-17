@@ -1,0 +1,150 @@
+.hero-section {
+  padding: 3rem 0 1.5rem;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 2rem;
+  align-items: center;
+}
+
+.hero-copy__eyebrow {
+  display: inline-block;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(0, 204, 102, 0.14);
+  color: #0d7f47;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.hero-copy h1 {
+  font-size: clamp(2.2rem, 4vw, 4rem);
+  line-height: 1.05;
+  margin-bottom: 1rem;
+  font-weight: 800;
+}
+
+.hero-copy p {
+  color: var(--sp-muted);
+  font-size: 1.05rem;
+  max-width: 640px;
+}
+
+.hero-copy__actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.hero-card,
+.table-card {
+  background: var(--sp-surface);
+  border: 1px solid rgba(11, 37, 25, 0.08);
+  box-shadow: 0 20px 45px rgba(17, 29, 23, 0.08);
+}
+
+.hero-card {
+  border-radius: 28px;
+  padding: 1rem;
+}
+
+.hero-card--form {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.hero-card img {
+  width: 100%;
+  display: block;
+  border-radius: 20px;
+}
+
+.plate-panel {
+  padding: 0.5rem 0.35rem 0;
+}
+
+.plate-panel h2 {
+  margin: 0 0 0.4rem;
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.plate-panel p {
+  color: var(--sp-muted);
+  margin-bottom: 1rem;
+}
+
+.summary-section,
+.dashboard-section {
+  padding: 1.5rem 0;
+}
+
+.section-heading {
+  margin-bottom: 1.25rem;
+}
+
+.section-heading h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.85rem;
+  font-weight: 800;
+}
+
+.section-heading p {
+  margin: 0;
+  color: var(--sp-muted);
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.summary-card {
+  padding: 1.3rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 15px 35px rgba(17, 29, 23, 0.07);
+}
+
+.summary-card span {
+  display: block;
+  color: var(--sp-muted);
+  margin-bottom: 0.45rem;
+}
+
+.summary-card strong {
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+
+.table-card {
+  border-radius: 22px;
+  overflow: hidden;
+}
+
+.table-card th {
+  background: var(--sp-dark);
+  color: #fff;
+}
+
+.table-card td,
+.table-card th {
+  padding: 1rem;
+}
+
+@media (max-width: 900px) {
+  .hero-grid,
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-copy__actions {
+    flex-direction: column;
+  }
+}

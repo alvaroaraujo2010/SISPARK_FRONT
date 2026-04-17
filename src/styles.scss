@@ -1,0 +1,43 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --sp-dark: #1f252d;
+  --sp-ink: #2e2f38;
+  --sp-green: #00cc66;
+  --sp-green-deep: #00994d;
+  --sp-gold: #f0ae21;
+  --sp-surface: #ffffff;
+  --sp-surface-soft: #f7faf8;
+  --sp-border: #d7e2db;
+  --sp-muted: #6d7782;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: 'Poppins', sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(0, 204, 102, 0.12), transparent 24%),
+    linear-gradient(180deg, #eef8f1 0%, #ffffff 22%, #f8faf9 100%);
+  color: var(--sp-ink);
+}
+
+body {
+  min-height: 100vh;
+}
+
+a {
+  text-decoration: none;
+}
+
+.container-shell {
+  width: min(1120px, calc(100% - 2rem));
+  margin: 0 auto;
+}

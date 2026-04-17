@@ -1,0 +1,140 @@
+<section class="hero-section">
+  <div class="container-shell hero-grid">
+    <div class="hero-copy">
+      <span class="hero-copy__eyebrow">Modulo administrativo</span>
+      <h1>Control operativo del parqueadero.</h1>
+      <p>
+        Esta vista es solo administrativa. Todas las acciones realizadas aqui quedan asociadas al
+        usuario autenticado en el sistema.
+      </p>
+
+      <div class="hero-copy__actions">
+        <a class="btn btn-success" routerLink="/admin/vehiculos">Registrar vehiculo</a>
+        <button class="btn btn-outline-dark" type="button" (click)="loadActiveVehicles(); loadDashboardSummary()">
+          Actualizar tablero
+        </button>
+      </div>
+    </div>
+
+    <div class="hero-card hero-card--form">
+      <img alt="Leyenda de parqueadero" src="images/leyenda.png" />
+
+      <div class="plate-panel">
+        <h2>Ingreso y salida por placa</h2>
+        <p>Para operar el parqueadero debes estar autenticado y la accion quedara ligada a tu usuario.</p>
+
+        <form [formGroup]="plateForm" (ngSubmit)="submitPlate()">
+          <input
+            class="form-control text-center text-uppercase"
+            formControlName="plate"
+            maxlength="6"
+            placeholder="ABC123"
+          />
+
+          @if (movementError()) {
+            <div class="alert alert-danger mt-3 mb-0" role="alert">{{ movementError() }}</div>
+          }
+
+          @if (movementMessage()) {
+            <div class="alert alert-success mt-3 mb-0" role="alert">{{ movementMessage() }}</div>
+          }
+
+          <button class="btn btn-success w-100 mt-3" type="submit" [disabled]="isSubmittingMovement()">
+            {{ isSubmittingMovement() ? 'Procesando...' : 'Validar placa' }}
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="summary-section">
+  <div class="container-shell">
+    <div class="section-heading">
+      <h2>Resumen del dia</h2>
+      <p>Indicadores rapidos para la operacion administrativa.</p>
+    </div>
+
+    @if (summaryError()) {
+      <div class="alert alert-danger mb-3" role="alert">{{ summaryError() }}</div>
+    }
+
+    <div class="summary-grid">
+      <article class="summary-card">
+        <span>Vehiculos activos</span>
+        <strong>{{ isLoadingSummary() ? '...' : (dashboardSummary()?.activeVehicles ?? 0) }}</strong>
+      </article>
+
+      <article class="summary-card">
+        <span>Cupos disponibles</span>
+        <strong>{{ isLoadingSummary() ? '...' : (dashboardSummary()?.availableSpots ?? 0) }}</strong>
+      </article>
+
+      <article class="summary-card">
+        <span>Ingresos del dia</span>
+        <strong>
+          {{
+            isLoadingSummary()
+              ? '...'
+              : ((dashboardSummary()?.dailyRevenue ?? 0) | currency: 'COP' : 'symbol' : '1.0-0')
+          }}
+        </strong>
+      </article>
+
+      <article class="summary-card">
+        <span>Mensualidades por vencer</span>
+        <strong>{{ isLoadingSummary() ? '...' : (dashboardSummary()?.monthlyDueSoon ?? 0) }}</strong>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="dashboard-section">
+  <div class="container-shell">
+    <div class="section-heading">
+      <h2>Vehiculos en parqueadero</h2>
+      <p>Vista operativa conectada al endpoint real de SISPARK.</p>
+    </div>
+
+    <div class="table-card">
+      @if (loadError()) {
+        <div class="alert alert-danger m-3 mb-0" role="alert">{{ loadError() }}</div>
+      }
+
+      <table class="table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Placa</th>
+            <th>Servicio</th>
+            <th>Fecha de ingreso</th>
+            <th>Fecha de salida</th>
+            <th>Valor a pagar</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (isLoadingVehicles()) {
+            <tr>
+              <td colspan="5" class="text-center py-4">Cargando vehiculos...</td>
+            </tr>
+          }
+
+          @if (!isLoadingVehicles() && activeVehicles().length === 0) {
+            <tr>
+              <td colspan="5" class="text-center py-4">No hay vehiculos activos en este momento.</td>
+            </tr>
+          }
+
+          @for (vehicle of activeVehicles(); track vehicle.idRegistro) {
+            <tr>
+              <td>{{ vehicle.placa }}</td>
+              <td>{{ vehicle.tipoServicio }}</td>
+              <td>{{ vehicle.fechaIngreso | date: 'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ vehicle.fechaSalida ? (vehicle.fechaSalida | date: 'dd/MM/yyyy HH:mm') : '--' }}</td>
+              <td>{{ vehicle.valorPagar | currency: 'COP' : 'symbol' : '1.0-0' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

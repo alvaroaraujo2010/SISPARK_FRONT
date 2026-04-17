@@ -1,0 +1,113 @@
+<section class="services-shell">
+  <div class="container-shell services-shell__grid">
+    <div class="services-copy">
+      <span>Registro administrativo</span>
+      <h1>Registro real de clientes y vehiculos.</h1>
+      <p>
+        Esta pantalla guarda el cliente y el vehiculo en MySQL. El registro queda asociado al usuario
+        autenticado que realiza la operacion.
+      </p>
+
+      <img alt="Parqueadero SISPARK" src="images/hero-parking.jpg" />
+    </div>
+
+    <div class="services-form">
+      <form [formGroup]="vehicleForm" (ngSubmit)="submitPreview()">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Tipo de identificacion</label>
+            <select class="form-select" formControlName="identificationType">
+              <option value="">Seleccione</option>
+              <option value="CC">Cedula</option>
+              <option value="TI">Tarjeta de identidad</option>
+              <option value="CE">Cedula de extranjeria</option>
+              <option value="PAS">Pasaporte</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Numero de identificacion</label>
+            <input class="form-control" formControlName="identificationNumber" />
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Nombre completo</label>
+            <input class="form-control" formControlName="fullName" />
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Correo electronico</label>
+            <input class="form-control" formControlName="email" type="email" />
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Telefono</label>
+            <input class="form-control" formControlName="phone" />
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Direccion</label>
+            <input class="form-control" formControlName="address" />
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Placa</label>
+            <input class="form-control text-uppercase" formControlName="plate" />
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Marca</label>
+            <input class="form-control" formControlName="brand" />
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Modelo del vehiculo</label>
+            <input class="form-control" formControlName="vehicleModel" />
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Color</label>
+            <input class="form-control" formControlName="color" />
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Tipo de vehiculo</label>
+            <select class="form-select" formControlName="vehicleTypeId">
+              <option [value]="0">Seleccione</option>
+              @for (vehicleType of vehicleTypes; track vehicleType.id) {
+                <option [value]="vehicleType.id">{{ vehicleType.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Tipo de pago</label>
+            <select class="form-select" formControlName="paymentType">
+              <option value="">Seleccione</option>
+              <option value="HORAS">Pago por horas</option>
+              <option value="DIARIO">Pago diario</option>
+              <option value="MENSUAL">Mensualidad</option>
+            </select>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Comentarios</label>
+            <textarea class="form-control" formControlName="comments" rows="4"></textarea>
+          </div>
+        </div>
+
+        @if (errorMessage) {
+          <div class="alert alert-danger mt-3 mb-0" role="alert">{{ errorMessage }}</div>
+        }
+
+        @if (successMessage) {
+          <div class="alert alert-success mt-3 mb-0" role="alert">{{ successMessage }}</div>
+        }
+
+        <button class="btn btn-success mt-4 w-100" type="submit" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Guardando...' : 'Registrar' }}
+        </button>
+      </form>
+    </div>
+  </div>
+</section>

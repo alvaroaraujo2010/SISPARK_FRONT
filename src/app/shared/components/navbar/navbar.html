@@ -1,0 +1,20 @@
+<header class="navbar-shell">
+  <div class="container-shell navbar-shell__inner">
+    <a class="brand" routerLink="/admin/inicio">
+      <img alt="Logo SISPARK" src="images/logo_moderno_de_sispark.png" />
+      <div>
+        <span>SISPARK</span>
+        <small>Modulo administrativo</small>
+      </div>
+    </a>
+
+    <nav class="nav-links">
+      <a routerLink="/admin/inicio" routerLinkActive="active">Inicio</a>
+      <a routerLink="/admin/vehiculos" routerLinkActive="active">Vehiculos</a>
+      @if (isAuthenticated()) {
+        <span class="nav-user">{{ session()?.fullName }}</span>
+        <a routerLink="/login" (click)="logout()">Salir</a>
+      }
+    </nav>
+  </div>
+</header>
