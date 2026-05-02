@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none" role="img" aria-labelledby="sisparkLogoTitle">
+  <title id="sisparkLogoTitle">SISPARK</title>
+  <defs>
+    <linearGradient id="spSurface" x1="8" y1="4" x2="152" y2="156" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#023220"/>
+      <stop offset="0.45" stop-color="#009152"/>
+      <stop offset="1" stop-color="#2cf0a2"/>
+    </linearGradient>
+    <linearGradient id="spGloss" x1="48" y1="20" x2="120" y2="88" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="160" height="160" rx="38" fill="url(#spSurface)"/>
+  <ellipse cx="80" cy="52" rx="56" ry="34" fill="url(#spGloss)"/>
+  <!-- P tipografico (system-ui para aspecto moderno y predecible) -->
+  <text
+    x="80"
+    y="118"
+    text-anchor="middle"
+    font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+    font-size="102"
+    font-weight="800"
+    fill="#f6fffa"
+    letter-spacing="-0.04em"
+  >
+    P
+  </text>
+  <!-- Linea de piso / slot -->
+  <path
+    stroke="#021a10"
+    stroke-opacity="0.28"
+    stroke-width="5"
+    stroke-linecap="round"
+    d="M36 132h88"
+  />
+</svg>

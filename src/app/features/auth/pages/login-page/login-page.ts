@@ -1,7 +1,8 @@
-import { Component, inject } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { getHttpErrorMessage } from '../../../../core/http/problem-details';
 import { Auth } from '../../../../core/services/auth';
 
 @Component({
@@ -14,18 +15,25 @@ export class LoginPage {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(Auth);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   protected readonly loginForm = this.fb.nonNullable.group({
-    username: ['', [Validators.required, Validators.maxLength(20)]],
-    password: ['', [Validators.required, Validators.maxLength(20)]],
+    username: ['', [Validators.required, Validators.maxLength(50)]],
+    password: ['', [Validators.required, Validators.maxLength(100)]],
   });
   protected isSubmitting = false;
   protected errorMessage = '';
   protected successMessage = '';
 
   constructor() {
+    const reason = this.route.snapshot.queryParamMap.get('reason');
+
+    if (reason === 'session-expired') {
+      this.errorMessage = 'Tu sesion expiro. Ingresa nuevamente para continuar.';
+    }
+
     if (this.auth.isAuthenticated()) {
-      void this.router.navigateByUrl('/admin/inicio');
+      void this.router.navigateByUrl(this.getRedirectUrl());
     }
   }
 
@@ -44,14 +52,20 @@ export class LoginPage {
       next: (response) => {
         this.isSubmitting = false;
         this.successMessage = `Bienvenido, ${response.fullName}.`;
-        void this.router.navigateByUrl('/admin/inicio');
+        void this.router.navigateByUrl(this.getRedirectUrl());
       },
       error: (error: HttpErrorResponse) => {
         this.isSubmitting = false;
-        this.errorMessage =
-          error.error?.message ??
-          'No fue posible iniciar sesion. Verifica tus credenciales e intenta de nuevo.';
+        this.errorMessage = getHttpErrorMessage(
+          error,
+          'No fue posible iniciar sesion. Verifica tus credenciales e intenta de nuevo.',
+        );
       },
     });
+  }
+
+  private getRedirectUrl(): string {
+    const redirectUrl = this.route.snapshot.queryParamMap.get('redirectUrl');
+    return redirectUrl?.startsWith('/admin') ? redirectUrl : '/admin/inicio';
   }
 }

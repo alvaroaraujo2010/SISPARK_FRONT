@@ -1,50 +1,32 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
+import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import type {
+  DashboardSummary,
+  VehicleRegistrationPayload,
+  VehicleRegistrationResult,
+  VehicleType,
+} from '../models/api.types';
 
-export type DashboardSummary = {
-  activeVehicles: number;
-  availableSpots: number;
-  dailyRevenue: number;
-  monthlyDueSoon: number;
-};
-
-export type VehicleType = {
-  id: number;
-  name: string;
-};
-
-export type VehicleRegistrationPayload = {
-  identificationType: string;
-  identificationNumber: string;
-  fullName: string;
-  email: string;
-  phone: string;
-  address?: string;
-  plate: string;
-  brand: string;
-  vehicleModel: string;
-  color: string;
-  vehicleTypeId: number;
-  paymentType: string;
-  comments?: string;
-};
+export type { VehicleType, VehicleRegistrationPayload, DashboardSummary } from '../models/api.types';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AdminService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:5045/api/admin';
+  private readonly apiUrl = `${environment.apiBaseUrl}/admin`;
 
-  getDashboardSummary() {
+  getDashboardSummary(): Observable<DashboardSummary> {
     return this.http.get<DashboardSummary>(`${this.apiUrl}/dashboard-summary`);
   }
 
-  getVehicleTypes() {
+  getVehicleTypes(): Observable<VehicleType[]> {
     return this.http.get<VehicleType[]>(`${this.apiUrl}/vehicle-types`);
   }
 
-  registerVehicle(payload: VehicleRegistrationPayload) {
-    return this.http.post(`${this.apiUrl}/vehicle-registrations`, payload);
+  registerVehicle(payload: VehicleRegistrationPayload): Observable<VehicleRegistrationResult> {
+    return this.http.post<VehicleRegistrationResult>(`${this.apiUrl}/vehicle-registrations`, payload);
   }
 }

@@ -1,11 +1,15 @@
 <section class="public-hero">
   <div class="container-shell public-hero__grid">
     <div class="public-hero__copy">
-      <span class="public-hero__eyebrow">SISPARK</span>
-      <h1>Plataforma para administrar parqueaderos con control operativo y trazabilidad.</h1>
+      <div class="public-trustbar">
+        <span class="public-hero__eyebrow">SISPARK</span>
+        <span class="public-trustbar__chip"><i class="bi bi-shield-check"></i> Operacion segura</span>
+      </div>
+
+      <h1>Gestion profesional para parqueaderos con control, trazabilidad y operacion en tiempo real.</h1>
       <p>
-        Esta es la zona publica del proyecto. La operacion administrativa y el registro de vehiculos
-        se realizan dentro del modulo seguro para usuarios autenticados.
+        Esta es la zona institucional del sistema. Desde aqui presentamos la plataforma y dirigimos a
+        operadores, cajeros y administradores hacia el modulo seguro de trabajo.
       </p>
 
       <div class="public-hero__actions">
@@ -13,19 +17,59 @@
           Entrar a zona administrativa
         </button>
         <button class="btn btn-outline-dark" type="button" (click)="goToAdminLogin()">
-          Acceso de operadores
+          Ingreso de operadores
         </button>
+      </div>
+
+      <div class="public-metrics">
+        <article>
+          <strong>Trazabilidad</strong>
+          <span>Cada accion queda asociada al usuario autenticado.</span>
+        </article>
+        <article>
+          <strong>Operacion</strong>
+          <span>Ingreso, salida, registros y control diario del parqueadero.</span>
+        </article>
+        <article>
+          <strong>Escalabilidad</strong>
+          <span>Modelo preparado para pagos, mensualidades y auditoria.</span>
+        </article>
       </div>
     </div>
 
     <div class="public-hero__panel">
-      <img alt="Logo SISPARK" src="images/logo_moderno_de_sispark.png" />
-      <div>
-        <h2>Zona publica</h2>
-        <p>
-          Informacion general, acceso al sistema y futura vitrina de servicios para clientes y
-          visitantes.
-        </p>
+      <div class="public-hero__panel-top">
+        <span class="logo-tile logo-tile--hero" aria-hidden="true">
+          <img src="images/logo_moderno_de_sispark.png" alt="" decoding="async" />
+        </span>
+        <div>
+          <h2>Centro digital del parqueadero</h2>
+          <p>Una base unica para control operativo, usuarios y crecimiento comercial.</p>
+        </div>
+      </div>
+
+      <div class="public-hero__panel-grid">
+        <article>
+          <i class="bi bi-speedometer2"></i>
+          <div>
+            <strong>Tablero operativo</strong>
+            <span>Vista rapida de ocupacion, ingresos y alertas.</span>
+          </div>
+        </article>
+        <article>
+          <i class="bi bi-car-front"></i>
+          <div>
+            <strong>Registro maestro</strong>
+            <span>Clientes y vehiculos bajo control administrativo.</span>
+          </div>
+        </article>
+        <article>
+          <i class="bi bi-credit-card-2-front"></i>
+          <div>
+            <strong>Escenario de caja</strong>
+            <span>Preparado para pagos y mensualidades.</span>
+          </div>
+        </article>
       </div>
     </div>
   </div>
@@ -35,7 +79,7 @@
   <div class="container-shell public-info__grid">
     <article>
       <h3>Area administrativa</h3>
-      <p>Ingreso, salida, registro de vehiculos, control de pagos y operacion diaria.</p>
+      <p>Ingreso, salida, registro de vehiculos, control de pagos y operacion diaria centralizada.</p>
     </article>
 
     <article>

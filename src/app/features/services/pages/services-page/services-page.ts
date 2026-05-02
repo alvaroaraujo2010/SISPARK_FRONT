@@ -1,7 +1,10 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { getHttpErrorMessage } from '../../../../core/http/problem-details';
 import { AdminService, VehicleType } from '../../../../core/services/admin';
+import { Auth } from '../../../../core/services/auth';
 
 @Component({
   selector: 'app-services-page',
@@ -12,6 +15,25 @@ import { AdminService, VehicleType } from '../../../../core/services/admin';
 export class ServicesPage {
   private readonly fb = inject(FormBuilder);
   private readonly adminService = inject(AdminService);
+  private readonly auth = inject(Auth);
+
+  protected readonly session = this.auth.session;
+
+  protected readonly vehicleTypesResource = rxResource<VehicleType[], undefined>({
+    defaultValue: [],
+    stream: () => this.adminService.getVehicleTypes(),
+  });
+
+  protected readonly vehicleTypes = computed(() => this.vehicleTypesResource.value() ?? []);
+
+  protected readonly vehicleTypesLoadError = computed(() =>
+    this.vehicleTypesResource.status() === 'error'
+      ? getHttpErrorMessage(
+          this.vehicleTypesResource.error(),
+          'No fue posible cargar los tipos de vehiculo.',
+        )
+      : '',
+  );
 
   protected readonly vehicleForm = this.fb.nonNullable.group({
     identificationType: ['', Validators.required],
@@ -20,7 +42,7 @@ export class ServicesPage {
     email: ['', [Validators.required, Validators.email]],
     phone: ['', Validators.required],
     address: [''],
-    plate: ['', [Validators.required, Validators.maxLength(6)]],
+    plate: ['', [Validators.required, Validators.maxLength(15)]],
     brand: ['', Validators.required],
     vehicleModel: ['', Validators.required],
     color: [''],
@@ -28,16 +50,12 @@ export class ServicesPage {
     paymentType: ['', Validators.required],
     comments: [''],
   });
-  protected vehicleTypes: VehicleType[] = [];
+
   protected isSubmitting = false;
   protected successMessage = '';
   protected errorMessage = '';
 
-  constructor() {
-    this.loadVehicleTypes();
-  }
-
-  protected submitPreview(): void {
+  protected submitRegistration(): void {
     if (this.vehicleForm.invalid) {
       this.vehicleForm.markAllAsTouched();
       return;
@@ -53,9 +71,9 @@ export class ServicesPage {
     };
 
     this.adminService.registerVehicle(payload).subscribe({
-      next: () => {
+      next: (result) => {
         this.isSubmitting = false;
-        this.successMessage = 'Cliente y vehiculo registrados correctamente.';
+        this.successMessage = result.message || 'Cliente y vehiculo registrados correctamente.';
         this.vehicleForm.reset({
           identificationType: '',
           identificationNumber: '',
@@ -74,20 +92,15 @@ export class ServicesPage {
       },
       error: (error: HttpErrorResponse) => {
         this.isSubmitting = false;
-        this.errorMessage =
-          error.error?.message ?? 'No fue posible guardar el registro del cliente y del vehiculo.';
+        this.errorMessage = getHttpErrorMessage(
+          error,
+          'No fue posible guardar el registro del cliente y del vehiculo.',
+        );
       },
     });
   }
 
-  private loadVehicleTypes(): void {
-    this.adminService.getVehicleTypes().subscribe({
-      next: (vehicleTypes) => {
-        this.vehicleTypes = vehicleTypes;
-      },
-      error: () => {
-        this.errorMessage = 'No fue posible cargar los tipos de vehiculo.';
-      },
-    });
+  protected retryVehicleTypes(): void {
+    this.vehicleTypesResource.reload();
   }
 }

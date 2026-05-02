@@ -27,18 +27,22 @@ export const routes: Routes = [
   {
     path: 'admin',
     component: AdminLayout,
+    canActivate: [authGuard],
     children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'inicio',
+      },
       {
         path: 'inicio',
         component: HomePage,
         title: 'Inicio administrativo | SISPARK',
-        canActivate: [authGuard],
       },
       {
         path: 'vehiculos',
         component: ServicesPage,
         title: 'Registro de vehiculos | SISPARK',
-        canActivate: [authGuard],
       },
     ],
   },

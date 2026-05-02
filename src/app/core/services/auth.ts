@@ -1,13 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { tap } from 'rxjs';
-
-type LoginResponse = {
-  token: string;
-  expiresAt: string;
-  fullName: string;
-  username: string;
-};
+import { environment } from '../../../environments/environment';
+import type { LoginResponse } from '../models/api.types';
 
 export type SessionData = LoginResponse & {
   userId: number | null;
@@ -18,31 +13,51 @@ export type SessionData = LoginResponse & {
 })
 export class Auth {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:5045/api/auth';
+  private readonly apiUrl = `${environment.apiBaseUrl}/auth`;
   private readonly storageKey = 'sispark_session';
-  private readonly sessionSignal = signal<SessionData | null>(this.readStoredSession());
+  private readonly sessionSignal = signal<SessionData | null>(null);
+  private sessionTimeoutId: number | null = null;
 
   readonly session = computed(() => this.sessionSignal());
   readonly isAuthenticated = computed(() => !!this.sessionSignal()?.token);
 
+  constructor() {
+    const storedSession = this.readStoredSession();
+    this.sessionSignal.set(storedSession);
+
+    if (storedSession) {
+      this.scheduleSessionExpiration(storedSession);
+    }
+  }
+
   login(username: string, password: string) {
-    return this.http
-      .post<LoginResponse>(`${this.apiUrl}/login`, { username, password })
-      .pipe(
-        tap((response) => {
-          const sessionData: SessionData = {
-            ...response,
-            userId: this.extractUserIdFromToken(response.token),
-          };
-          this.sessionSignal.set(sessionData);
-          localStorage.setItem(this.storageKey, JSON.stringify(sessionData));
-        }),
-      );
+    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { username, password }).pipe(
+      tap((response) => {
+        const sessionData: SessionData = {
+          ...response,
+          userId: this.extractUserIdFromToken(response.token),
+        };
+
+        this.persistSession(sessionData);
+      }),
+    );
   }
 
   logout(): void {
+    this.clearSessionTimer();
     this.sessionSignal.set(null);
     localStorage.removeItem(this.storageKey);
+  }
+
+  getAccessToken(): string | null {
+    return this.sessionSignal()?.token ?? null;
+  }
+
+  private persistSession(sessionData: SessionData): void {
+    this.clearSessionTimer();
+    this.sessionSignal.set(sessionData);
+    localStorage.setItem(this.storageKey, JSON.stringify(sessionData));
+    this.scheduleSessionExpiration(sessionData);
   }
 
   private readStoredSession(): SessionData | null {
@@ -52,11 +67,42 @@ export class Auth {
     }
 
     try {
-      return JSON.parse(rawSession) as SessionData;
+      const session = JSON.parse(rawSession) as SessionData;
+
+      if (this.isSessionExpired(session)) {
+        localStorage.removeItem(this.storageKey);
+        return null;
+      }
+
+      return session;
     } catch {
       localStorage.removeItem(this.storageKey);
       return null;
     }
+  }
+
+  private scheduleSessionExpiration(sessionData: SessionData): void {
+    const remainingMs = new Date(sessionData.expiresAt).getTime() - Date.now();
+
+    if (remainingMs <= 0) {
+      this.logout();
+      return;
+    }
+
+    this.sessionTimeoutId = window.setTimeout(() => {
+      this.logout();
+    }, remainingMs);
+  }
+
+  private clearSessionTimer(): void {
+    if (this.sessionTimeoutId !== null) {
+      window.clearTimeout(this.sessionTimeoutId);
+      this.sessionTimeoutId = null;
+    }
+  }
+
+  private isSessionExpired(session: SessionData): boolean {
+    return new Date(session.expiresAt).getTime() <= Date.now();
   }
 
   private extractUserIdFromToken(token: string): number | null {

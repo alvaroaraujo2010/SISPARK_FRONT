@@ -1,13 +1,13 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Auth } from '../services/auth';
+import { isAppApiRequest } from '../http/api-url';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(Auth);
-  const token = auth.session()?.token;
-  const isApiRequest = req.url.startsWith('http://localhost:5045/api/');
+  const token = auth.getAccessToken();
 
-  if (!token || !isApiRequest) {
+  if (!token || !isAppApiRequest(req.url)) {
     return next(req);
   }
 

@@ -1,20 +1,31 @@
 <header class="navbar-shell">
   <div class="container-shell navbar-shell__inner">
     <a class="brand" routerLink="/admin/inicio">
-      <img alt="Logo SISPARK" src="images/logo_moderno_de_sispark.png" />
+      <span class="logo-tile logo-tile--nav" aria-hidden="true">
+        <img src="images/logo_moderno_de_sispark.png" alt="" decoding="async" />
+      </span>
       <div>
         <span>SISPARK</span>
         <small>Modulo administrativo</small>
       </div>
     </a>
 
-    <nav class="nav-links">
-      <a routerLink="/admin/inicio" routerLinkActive="active">Inicio</a>
-      <a routerLink="/admin/vehiculos" routerLinkActive="active">Vehiculos</a>
+    <div class="navbar-shell__cluster">
+      <nav class="nav-links">
+        <a routerLink="/admin/inicio" routerLinkActive="active">Inicio</a>
+        <a routerLink="/admin/vehiculos" routerLinkActive="active">Vehiculos</a>
+      </nav>
+
       @if (isAuthenticated()) {
-        <span class="nav-user">{{ session()?.fullName }}</span>
-        <a routerLink="/login" (click)="logout()">Salir</a>
+        <div class="nav-session">
+          <span class="nav-user">
+            <small>Sesion activa</small>
+            <strong>{{ session()?.fullName }}</strong>
+          </span>
+          <span class="nav-role">{{ session()?.role }}</span>
+          <button class="nav-logout" type="button" (click)="logout()">Salir</button>
+        </div>
       }
-    </nav>
+    </div>
   </div>
 </header>

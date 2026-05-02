@@ -1,10 +1,22 @@
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { AdminService, DashboardSummary } from '../../../../core/services/admin';
-import { ActiveVehicle, Parking } from '../../../../core/services/parking';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { getHttpErrorMessage } from '../../../../core/http/problem-details';
+import type { ActiveVehicle, DashboardSummary } from '../../../../core/models/api.types';
+import { AdminService } from '../../../../core/services/admin';
+import { Auth } from '../../../../core/services/auth';
+import { Parking } from '../../../../core/services/parking';
+
+function formatCop(amount: number): string {
+  return amount.toLocaleString('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    maximumFractionDigits: 0,
+  });
+}
 
 @Component({
   selector: 'app-home-page',
@@ -12,28 +24,61 @@ import { ActiveVehicle, Parking } from '../../../../core/services/parking';
   templateUrl: './home-page.html',
   styleUrl: './home-page.scss',
 })
-export class HomePage implements OnInit {
+export class HomePage {
   private readonly fb = inject(FormBuilder);
   private readonly parking = inject(Parking);
   private readonly adminService = inject(AdminService);
+  private readonly auth = inject(Auth);
 
-  protected readonly activeVehicles = signal<ActiveVehicle[]>([]);
-  protected readonly dashboardSummary = signal<DashboardSummary | null>(null);
-  protected readonly plateForm = this.fb.nonNullable.group({
-    plate: ['', [Validators.required, Validators.maxLength(6)]],
+  protected readonly session = this.auth.session;
+
+  protected readonly dashboardResource = rxResource<DashboardSummary, undefined>({
+    stream: () => this.adminService.getDashboardSummary(),
   });
-  protected readonly isLoadingVehicles = signal(true);
-  protected readonly isLoadingSummary = signal(true);
+
+  protected readonly vehiclesResource = rxResource<ActiveVehicle[], undefined>({
+    stream: () => this.parking.getActiveVehicles(),
+  });
+
+  protected readonly searchQuery = signal('');
+
+  protected readonly filteredActiveVehicles = computed(() => {
+    const query = this.searchQuery().trim().toLowerCase();
+    const vehicles = this.vehiclesResource.value() ?? [];
+
+    if (!query) {
+      return vehicles;
+    }
+
+    return vehicles.filter(
+      (vehicle) =>
+        vehicle.placa.toLowerCase().includes(query) ||
+        vehicle.tipoServicio.toLowerCase().includes(query),
+    );
+  });
+
+  protected readonly plateForm = this.fb.nonNullable.group({
+    plate: ['', [Validators.required, Validators.maxLength(15)]],
+  });
+
   protected readonly isSubmittingMovement = signal(false);
-  protected readonly loadError = signal('');
-  protected readonly summaryError = signal('');
   protected readonly movementError = signal('');
   protected readonly movementMessage = signal('');
 
-  ngOnInit(): void {
-    this.loadDashboardSummary();
-    this.loadActiveVehicles();
-  }
+  protected readonly summaryError = computed(() =>
+    this.dashboardResource.status() === 'error'
+      ? getHttpErrorMessage(
+          this.dashboardResource.error(),
+          'No fue posible cargar el resumen administrativo.',
+        )
+      : '',
+  );
+
+  protected readonly loadError = computed(() =>
+    this.vehiclesResource.status() === 'error'
+      ? getHttpErrorMessage(this.vehiclesResource.error(), 'No fue posible cargar los vehiculos activos.')
+      : '',
+  );
 
   protected submitPlate(): void {
     if (this.plateForm.invalid) {
@@ -49,51 +94,30 @@ export class HomePage implements OnInit {
     this.parking.registerEntryExit(plate.toUpperCase()).subscribe({
       next: (response) => {
         this.isSubmittingMovement.set(false);
-        this.movementMessage.set(response.message);
+        let msg = response.message;
+        if (response.action === 'exit' && response.totalToPay != null) {
+          msg = `${msg} · Total ${formatCop(response.totalToPay)}`;
+        }
+        this.movementMessage.set(msg);
         this.plateForm.reset();
-        this.loadActiveVehicles();
-        this.loadDashboardSummary();
+        this.dashboardResource.reload();
+        this.vehiclesResource.reload();
       },
       error: (error: HttpErrorResponse) => {
         this.isSubmittingMovement.set(false);
         this.movementError.set(
-          error.error?.message ?? 'No fue posible registrar el movimiento del vehiculo.',
+          getHttpErrorMessage(error, 'No fue posible registrar el movimiento del vehiculo.'),
         );
       },
     });
   }
 
-  protected loadActiveVehicles(): void {
-    this.isLoadingVehicles.set(true);
-    this.loadError.set('');
-
-    this.parking.getActiveVehicles().subscribe({
-      next: (vehicles) => {
-        this.activeVehicles.set(vehicles);
-        this.isLoadingVehicles.set(false);
-      },
-      error: (error: HttpErrorResponse) => {
-        this.isLoadingVehicles.set(false);
-        this.loadError.set(error.error?.message ?? 'No fue posible cargar los vehiculos activos.');
-      },
-    });
+  protected refreshBoard(): void {
+    this.dashboardResource.reload();
+    this.vehiclesResource.reload();
   }
 
-  protected loadDashboardSummary(): void {
-    this.isLoadingSummary.set(true);
-    this.summaryError.set('');
-
-    this.adminService.getDashboardSummary().subscribe({
-      next: (summary) => {
-        this.dashboardSummary.set(summary);
-        this.isLoadingSummary.set(false);
-      },
-      error: (error: HttpErrorResponse) => {
-        this.isLoadingSummary.set(false);
-        this.summaryError.set(
-          error.error?.message ?? 'No fue posible cargar el resumen administrativo.',
-        );
-      },
-    });
+  protected updateSearch(query: string): void {
+    this.searchQuery.set(query);
   }
 }

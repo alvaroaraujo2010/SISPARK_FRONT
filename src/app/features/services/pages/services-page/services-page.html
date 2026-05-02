@@ -2,111 +2,199 @@
   <div class="container-shell services-shell__grid">
     <div class="services-copy">
       <span>Registro administrativo</span>
-      <h1>Registro real de clientes y vehiculos.</h1>
+      <h1>Alta de clientes y vehiculos con trazabilidad.</h1>
       <p>
-        Esta pantalla guarda el cliente y el vehiculo en MySQL. El registro queda asociado al usuario
-        autenticado que realiza la operacion.
+        Usa esta pantalla para crear el maestro administrativo del parqueadero con relacion directa al
+        usuario autenticado.
       </p>
+
+      <div class="services-copy__meta">
+        <article>
+          <small>Usuario activo</small>
+          <strong>{{ session()?.fullName }}</strong>
+          <span>{{ session()?.role }}</span>
+        </article>
+
+        <article>
+          <small>Objetivo</small>
+          <strong>Registro seguro</strong>
+          <span>Cliente, vehiculo y modalidad sugerida.</span>
+        </article>
+      </div>
+
+      <div class="services-copy__steps">
+        <div>
+          <i class="bi bi-1-circle-fill"></i>
+          <span>Datos del cliente</span>
+        </div>
+        <div>
+          <i class="bi bi-2-circle-fill"></i>
+          <span>Datos del vehiculo</span>
+        </div>
+        <div>
+          <i class="bi bi-3-circle-fill"></i>
+          <span>Servicio y observaciones</span>
+        </div>
+      </div>
 
       <img alt="Parqueadero SISPARK" src="images/hero-parking.jpg" />
     </div>
 
     <div class="services-form">
-      <form [formGroup]="vehicleForm" (ngSubmit)="submitPreview()">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label class="form-label">Tipo de identificacion</label>
-            <select class="form-select" formControlName="identificationType">
-              <option value="">Seleccione</option>
-              <option value="CC">Cedula</option>
-              <option value="TI">Tarjeta de identidad</option>
-              <option value="CE">Cedula de extranjeria</option>
-              <option value="PAS">Pasaporte</option>
-            </select>
+      <form [formGroup]="vehicleForm" (ngSubmit)="submitRegistration()">
+        @if (vehicleTypesLoadError()) {
+          <div class="status-banner status-banner--danger mb-3" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>{{ vehicleTypesLoadError() }}</span>
+            <button type="button" class="btn btn-sm btn-outline-dark ms-auto" (click)="retryVehicleTypes()">
+              Reintentar
+            </button>
+          </div>
+        }
+
+        <section class="form-section">
+          <div class="form-section__title">
+            <i class="bi bi-person-badge-fill"></i>
+            <div>
+              <h2>Informacion del cliente</h2>
+              <p>Datos del propietario o responsable del vehiculo.</p>
+            </div>
           </div>
 
-          <div class="col-md-6">
-            <label class="form-label">Numero de identificacion</label>
-            <input class="form-control" formControlName="identificationNumber" />
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Tipo de identificacion</label>
+              <select class="form-select" formControlName="identificationType">
+                <option value="">Seleccione</option>
+                <option value="CC">Cedula</option>
+                <option value="TI">Tarjeta de identidad</option>
+                <option value="CE">Cedula de extranjeria</option>
+                <option value="PAS">Pasaporte</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Numero de identificacion</label>
+              <input class="form-control" formControlName="identificationNumber" />
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Nombre completo</label>
+              <input class="form-control" formControlName="fullName" />
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Correo electronico</label>
+              <input class="form-control" formControlName="email" type="email" />
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Telefono</label>
+              <input class="form-control" formControlName="phone" />
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Direccion</label>
+              <input class="form-control" formControlName="address" />
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="form-section__title">
+            <i class="bi bi-car-front-fill"></i>
+            <div>
+              <h2>Informacion del vehiculo</h2>
+              <p>Datos maestros para el control operativo del parqueadero.</p>
+            </div>
           </div>
 
-          <div class="col-12">
-            <label class="form-label">Nombre completo</label>
-            <input class="form-control" formControlName="fullName" />
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Placa</label>
+              <input
+                class="form-control text-uppercase"
+                formControlName="plate"
+                maxlength="15"
+                autocomplete="off"
+              />
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Marca</label>
+              <input class="form-control" formControlName="brand" />
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Modelo del vehiculo</label>
+              <input class="form-control" formControlName="vehicleModel" />
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Color</label>
+              <input class="form-control" formControlName="color" />
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Tipo de vehiculo</label>
+              <select class="form-select" formControlName="vehicleTypeId">
+                <option [value]="0">Seleccione</option>
+                @for (vehicleType of vehicleTypes(); track vehicleType.id) {
+                  <option [value]="vehicleType.id">{{ vehicleType.name }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="form-section__title">
+            <i class="bi bi-wallet2"></i>
+            <div>
+              <h2>Servicio y observaciones</h2>
+              <p>Contexto comercial y notas operativas del registro.</p>
+            </div>
           </div>
 
-          <div class="col-md-6">
-            <label class="form-label">Correo electronico</label>
-            <input class="form-control" formControlName="email" type="email" />
-          </div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Tipo de pago</label>
+              <select class="form-select" formControlName="paymentType">
+                <option value="">Seleccione</option>
+                <option value="HORAS">Pago por horas</option>
+                <option value="DIARIO">Pago diario</option>
+                <option value="MENSUAL">Mensualidad</option>
+              </select>
+            </div>
 
-          <div class="col-md-6">
-            <label class="form-label">Telefono</label>
-            <input class="form-control" formControlName="phone" />
+            <div class="col-12">
+              <label class="form-label">Comentarios</label>
+              <textarea class="form-control" formControlName="comments" rows="4"></textarea>
+            </div>
           </div>
-
-          <div class="col-12">
-            <label class="form-label">Direccion</label>
-            <input class="form-control" formControlName="address" />
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">Placa</label>
-            <input class="form-control text-uppercase" formControlName="plate" />
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">Marca</label>
-            <input class="form-control" formControlName="brand" />
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">Modelo del vehiculo</label>
-            <input class="form-control" formControlName="vehicleModel" />
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">Color</label>
-            <input class="form-control" formControlName="color" />
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">Tipo de vehiculo</label>
-            <select class="form-select" formControlName="vehicleTypeId">
-              <option [value]="0">Seleccione</option>
-              @for (vehicleType of vehicleTypes; track vehicleType.id) {
-                <option [value]="vehicleType.id">{{ vehicleType.name }}</option>
-              }
-            </select>
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">Tipo de pago</label>
-            <select class="form-select" formControlName="paymentType">
-              <option value="">Seleccione</option>
-              <option value="HORAS">Pago por horas</option>
-              <option value="DIARIO">Pago diario</option>
-              <option value="MENSUAL">Mensualidad</option>
-            </select>
-          </div>
-
-          <div class="col-12">
-            <label class="form-label">Comentarios</label>
-            <textarea class="form-control" formControlName="comments" rows="4"></textarea>
-          </div>
-        </div>
+        </section>
 
         @if (errorMessage) {
-          <div class="alert alert-danger mt-3 mb-0" role="alert">{{ errorMessage }}</div>
+          <div class="status-banner status-banner--danger mt-3" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>{{ errorMessage }}</span>
+          </div>
         }
 
         @if (successMessage) {
-          <div class="alert alert-success mt-3 mb-0" role="alert">{{ successMessage }}</div>
+          <div class="status-banner status-banner--success mt-3" role="alert">
+            <i class="bi bi-check-circle-fill"></i>
+            <span>{{ successMessage }}</span>
+          </div>
         }
 
-        <button class="btn btn-success mt-4 w-100" type="submit" [disabled]="isSubmitting">
-          {{ isSubmitting ? 'Guardando...' : 'Registrar' }}
-        </button>
+        <div class="form-footer">
+          <p>El sistema asociara automaticamente este registro al usuario autenticado actual.</p>
+
+          <button class="btn btn-success" type="submit" [disabled]="isSubmitting">
+            {{ isSubmitting ? 'Guardando...' : 'Registrar vehiculo' }}
+          </button>
+        </div>
       </form>
     </div>
   </div>

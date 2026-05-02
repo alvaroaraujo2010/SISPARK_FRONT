@@ -1,49 +1,105 @@
 <section class="login-shell">
-  <div class="login-shell__panel">
-    <div class="login-shell__brand">
-      <img alt="Logo SISPARK" src="images/logo_moderno_de_sispark.png" />
-      <div>
-        <span>SISPARK</span>
-        <small>Acceso administrativo</small>
-      </div>
-    </div>
-
-    <h1>Inicia sesión</h1>
-    <p>Ingresa con tu usuario del sistema para acceder al panel administrativo de SISPARK.</p>
-
-    <form [formGroup]="loginForm" (ngSubmit)="login()">
-      <div class="mb-3">
-        <label class="form-label" for="username">Usuario</label>
-        <input id="username" class="form-control" formControlName="username" placeholder="user123" />
+  <div class="login-shell__grid">
+    <aside class="login-shell__spotlight">
+      <div class="login-shell__eyebrow">
+        <span class="login-shell__eyebrow-mark">SISPARK</span>
+        <span class="login-shell__eyebrow-chip"><i class="bi bi-shield-lock-fill"></i> Acceso protegido</span>
       </div>
 
-      <div class="mb-3">
-        <label class="form-label" for="password">Contraseña</label>
-        <input
-          id="password"
-          class="form-control"
-          formControlName="password"
-          placeholder="******"
-          type="password"
-        />
+      <h1>Zona administrativa con control de acceso y trazabilidad operativa.</h1>
+      <p>
+        Esta area esta reservada para administradores, operadores y personal autorizado. Cada
+        movimiento dentro del sistema queda ligado al usuario autenticado.
+      </p>
+
+      <div class="login-shell__benefits">
+        <article>
+          <i class="bi bi-person-badge-fill"></i>
+          <div>
+            <strong>Identidad operativa</strong>
+            <span>Los registros de clientes, vehiculos y movimientos quedan asociados al usuario activo.</span>
+          </div>
+        </article>
+
+        <article>
+          <i class="bi bi-speedometer2"></i>
+          <div>
+            <strong>Control en tiempo real</strong>
+            <span>Panel administrativo conectado al backend y a la base de datos principal.</span>
+          </div>
+        </article>
+
+        <article>
+          <i class="bi bi-clipboard-data-fill"></i>
+          <div>
+            <strong>Operacion preparada para crecer</strong>
+            <span>Base lista para pagos, mensualidades, auditoria y reportes del parqueadero.</span>
+          </div>
+        </article>
       </div>
 
-      @if (errorMessage) {
-        <div class="alert alert-danger" role="alert">{{ errorMessage }}</div>
-      }
+      <div class="login-shell__support">
+        <span>Uso institucional</span>
+        <strong>Ingresa con tus credenciales y accede al centro de control de SISPARK.</strong>
+      </div>
+    </aside>
 
-      @if (successMessage) {
-        <div class="alert alert-success" role="alert">{{ successMessage }}</div>
-      }
+    <div class="login-shell__panel">
+      <div class="login-shell__brand">
+        <span class="logo-tile logo-tile--login" aria-hidden="true">
+          <img src="images/logo_moderno_de_sispark.png" alt="" decoding="async" />
+        </span>
+        <div>
+          <span>SISPARK</span>
+          <small>Acceso administrativo</small>
+        </div>
+      </div>
 
-      <button class="btn btn-success w-100" type="submit" [disabled]="isSubmitting">
-        {{ isSubmitting ? 'Validando...' : 'Ingresar' }}
-      </button>
-    </form>
+      <div class="login-shell__heading">
+        <h2>Inicia sesion</h2>
+        <p>Valida tus credenciales para entrar al panel administrativo del parqueadero.</p>
+      </div>
 
-    <div class="login-shell__links">
-      <a routerLink="/">Volver al inicio</a>
-      <a routerLink="/servicios">Registrar vehículo</a>
+      <form [formGroup]="loginForm" (ngSubmit)="login()">
+        <div class="mb-3">
+          <label class="form-label" for="username">Usuario</label>
+          <input id="username" class="form-control" formControlName="username" placeholder="user123" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="password">Contrasena</label>
+          <input
+            id="password"
+            class="form-control"
+            formControlName="password"
+            placeholder="******"
+            type="password"
+          />
+        </div>
+
+        @if (errorMessage) {
+          <div class="status-banner status-banner--danger mb-3" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>{{ errorMessage }}</span>
+          </div>
+        }
+
+        @if (successMessage) {
+          <div class="status-banner status-banner--success mb-3" role="alert">
+            <i class="bi bi-check-circle-fill"></i>
+            <span>{{ successMessage }}</span>
+          </div>
+        }
+
+        <button class="btn btn-success w-100" type="submit" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Validando...' : 'Ingresar al panel' }}
+        </button>
+      </form>
+
+      <div class="login-shell__links">
+        <a routerLink="/">Volver al portal publico</a>
+        <span>Acceso solo para usuarios autorizados</span>
+      </div>
     </div>
   </div>
 </section>

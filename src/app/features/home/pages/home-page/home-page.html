@@ -1,89 +1,123 @@
-<section class="hero-section">
-  <div class="container-shell hero-grid">
-    <div class="hero-copy">
-      <span class="hero-copy__eyebrow">Modulo administrativo</span>
-      <h1>Control operativo del parqueadero.</h1>
-      <p>
-        Esta vista es solo administrativa. Todas las acciones realizadas aqui quedan asociadas al
-        usuario autenticado en el sistema.
+<section class="command-shell">
+  <div class="container-shell">
+    <div class="command-top">
+      <div class="command-top__intro">
+        <span class="command-header__eyebrow">Centro de control</span>
+        <h1>Operación administrativa en tiempo real.</h1>
+        <p>
+          Supervisa la ocupación, registra movimientos y mantén la trazabilidad de cada acción
+          operativa desde una sola vista.
+        </p>
+      </div>
+
+      <div class="session-oval" aria-label="Sesión activa">
+        <span class="session-oval__label">Sesión activa</span>
+        <strong class="session-oval__name">{{ session()?.fullName }}</strong>
+        <span class="session-oval__role">{{ session()?.role }}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="plate-section">
+  <div class="container-shell">
+    <article class="operation-card operation-card--plate">
+      <div class="operation-card__header">
+        <div>
+          <span class="section-kicker">Acción rápida</span>
+          <h2>Ingreso y salida por placa</h2>
+        </div>
+        <i class="bi bi-upc-scan" aria-hidden="true"></i>
+      </div>
+
+      <p class="operation-card__copy">
+        El registro operativo queda ligado al usuario autenticado y actualiza el tablero en tiempo
+        real.
       </p>
 
-      <div class="hero-copy__actions">
-        <a class="btn btn-success" routerLink="/admin/vehiculos">Registrar vehiculo</a>
-        <button class="btn btn-outline-dark" type="button" (click)="loadActiveVehicles(); loadDashboardSummary()">
-          Actualizar tablero
-        </button>
-      </div>
-    </div>
+      <form class="plate-form" [formGroup]="plateForm" (ngSubmit)="submitPlate()">
+        <label class="form-label visually-hidden" for="plate-input">Placa del vehículo</label>
+        <input
+          id="plate-input"
+          class="form-control text-center text-uppercase"
+          formControlName="plate"
+          maxlength="15"
+          placeholder="ABC123"
+          autocomplete="off"
+          inputmode="text"
+          [attr.aria-invalid]="plateForm.controls.plate.invalid && plateForm.controls.plate.touched"
+        />
 
-    <div class="hero-card hero-card--form">
-      <img alt="Leyenda de parqueadero" src="images/leyenda.png" />
+        @if (movementError()) {
+          <div class="status-banner status-banner--danger" role="alert">
+            <i class="bi bi-x-circle-fill"></i>
+            <span>{{ movementError() }}</span>
+          </div>
+        }
 
-      <div class="plate-panel">
-        <h2>Ingreso y salida por placa</h2>
-        <p>Para operar el parqueadero debes estar autenticado y la accion quedara ligada a tu usuario.</p>
+        @if (movementMessage()) {
+          <div class="status-banner status-banner--success" role="alert">
+            <i class="bi bi-check-circle-fill"></i>
+            <span>{{ movementMessage() }}</span>
+          </div>
+        }
 
-        <form [formGroup]="plateForm" (ngSubmit)="submitPlate()">
-          <input
-            class="form-control text-center text-uppercase"
-            formControlName="plate"
-            maxlength="6"
-            placeholder="ABC123"
-          />
-
-          @if (movementError()) {
-            <div class="alert alert-danger mt-3 mb-0" role="alert">{{ movementError() }}</div>
-          }
-
-          @if (movementMessage()) {
-            <div class="alert alert-success mt-3 mb-0" role="alert">{{ movementMessage() }}</div>
-          }
-
-          <button class="btn btn-success w-100 mt-3" type="submit" [disabled]="isSubmittingMovement()">
+        <div class="plate-form__actions">
+          <button class="btn btn-success" type="submit" [disabled]="isSubmittingMovement()">
             {{ isSubmittingMovement() ? 'Procesando...' : 'Validar placa' }}
           </button>
-        </form>
-      </div>
-    </div>
+          <button class="btn btn-outline-dark" type="button" (click)="refreshBoard()">
+            Actualizar tablero
+          </button>
+        </div>
+      </form>
+    </article>
   </div>
 </section>
 
 <section class="summary-section">
   <div class="container-shell">
     <div class="section-heading">
-      <h2>Resumen del dia</h2>
-      <p>Indicadores rapidos para la operacion administrativa.</p>
+      <h2>Resumen del día</h2>
+      <p>Indicadores clave para reaccionar rápido en la operación.</p>
     </div>
 
     @if (summaryError()) {
-      <div class="alert alert-danger mb-3" role="alert">{{ summaryError() }}</div>
+      <div class="status-banner status-banner--danger mb-3" role="alert">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span>{{ summaryError() }}</span>
+      </div>
     }
 
     <div class="summary-grid">
       <article class="summary-card">
-        <span>Vehiculos activos</span>
-        <strong>{{ isLoadingSummary() ? '...' : (dashboardSummary()?.activeVehicles ?? 0) }}</strong>
+        <i class="bi bi-car-front-fill"></i>
+        <span>Vehículos activos</span>
+        <strong>{{ dashboardResource.isLoading() ? '...' : (dashboardResource.value()?.activeVehicles ?? 0) }}</strong>
       </article>
 
       <article class="summary-card">
+        <i class="bi bi-grid-1x2-fill"></i>
         <span>Cupos disponibles</span>
-        <strong>{{ isLoadingSummary() ? '...' : (dashboardSummary()?.availableSpots ?? 0) }}</strong>
+        <strong>{{ dashboardResource.isLoading() ? '...' : (dashboardResource.value()?.availableSpots ?? 0) }}</strong>
       </article>
 
       <article class="summary-card">
-        <span>Ingresos del dia</span>
+        <i class="bi bi-cash-stack"></i>
+        <span>Ingresos del día</span>
         <strong>
           {{
-            isLoadingSummary()
+            dashboardResource.isLoading()
               ? '...'
-              : ((dashboardSummary()?.dailyRevenue ?? 0) | currency: 'COP' : 'symbol' : '1.0-0')
+              : ((dashboardResource.value()?.dailyRevenue ?? 0) | currency: 'COP' : 'symbol' : '1.0-0')
           }}
         </strong>
       </article>
 
       <article class="summary-card">
+        <i class="bi bi-calendar2-week-fill"></i>
         <span>Mensualidades por vencer</span>
-        <strong>{{ isLoadingSummary() ? '...' : (dashboardSummary()?.monthlyDueSoon ?? 0) }}</strong>
+        <strong>{{ dashboardResource.isLoading() ? '...' : (dashboardResource.value()?.monthlyDueSoon ?? 0) }}</strong>
       </article>
     </div>
   </div>
@@ -91,14 +125,32 @@
 
 <section class="dashboard-section">
   <div class="container-shell">
-    <div class="section-heading">
-      <h2>Vehiculos en parqueadero</h2>
-      <p>Vista operativa conectada al endpoint real de SISPARK.</p>
+    <div class="section-heading section-heading--split">
+      <div>
+        <h2>Vehículos en parqueadero</h2>
+        <p>Vista operativa conectada al backend real de SISPARK.</p>
+      </div>
+
+      <div class="table-toolbar">
+        <label class="table-search">
+          <i class="bi bi-search"></i>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Buscar por placa o servicio"
+            (input)="updateSearch($any($event.target).value)"
+          />
+        </label>
+        <span class="table-count">{{ filteredActiveVehicles().length }} visibles</span>
+      </div>
     </div>
 
     <div class="table-card">
       @if (loadError()) {
-        <div class="alert alert-danger m-3 mb-0" role="alert">{{ loadError() }}</div>
+        <div class="status-banner status-banner--danger table-card__status" role="alert">
+          <i class="bi bi-exclamation-octagon-fill"></i>
+          <span>{{ loadError() }}</span>
+        </div>
       }
 
       <table class="table align-middle mb-0">
@@ -112,22 +164,32 @@
           </tr>
         </thead>
         <tbody>
-          @if (isLoadingVehicles()) {
+          @if (vehiclesResource.isLoading()) {
             <tr>
-              <td colspan="5" class="text-center py-4">Cargando vehiculos...</td>
+              <td colspan="5" class="text-center py-4">Cargando vehículos...</td>
             </tr>
           }
 
-          @if (!isLoadingVehicles() && activeVehicles().length === 0) {
+          @if (!vehiclesResource.isLoading() && filteredActiveVehicles().length === 0) {
             <tr>
-              <td colspan="5" class="text-center py-4">No hay vehiculos activos en este momento.</td>
+              <td colspan="5" class="empty-row">
+                <div class="empty-state">
+                  <i class="bi bi-inboxes-fill"></i>
+                  <strong>No hay resultados para la vista actual.</strong>
+                  <span>Prueba otro criterio de búsqueda o registra un nuevo movimiento.</span>
+                </div>
+              </td>
             </tr>
           }
 
-          @for (vehicle of activeVehicles(); track vehicle.idRegistro) {
+          @for (vehicle of filteredActiveVehicles(); track vehicle.idRegistro) {
             <tr>
-              <td>{{ vehicle.placa }}</td>
-              <td>{{ vehicle.tipoServicio }}</td>
+              <td>
+                <span class="plate-badge">{{ vehicle.placa }}</span>
+              </td>
+              <td>
+                <span class="service-chip">{{ vehicle.tipoServicio }}</span>
+              </td>
               <td>{{ vehicle.fechaIngreso | date: 'dd/MM/yyyy HH:mm' }}</td>
               <td>{{ vehicle.fechaSalida ? (vehicle.fechaSalida | date: 'dd/MM/yyyy HH:mm') : '--' }}</td>
               <td>{{ vehicle.valorPagar | currency: 'COP' : 'symbol' : '1.0-0' }}</td>
@@ -136,5 +198,45 @@
         </tbody>
       </table>
     </div>
+  </div>
+</section>
+
+<section class="operations-section operations-section--shortcuts">
+  <div class="container-shell">
+    <article class="operation-card operation-card--aside operation-card--full">
+      <div class="operation-card__header">
+        <div>
+          <span class="section-kicker">Atajos</span>
+          <h2>Acciones del turno</h2>
+        </div>
+        <i class="bi bi-lightning-charge-fill" aria-hidden="true"></i>
+      </div>
+
+      <div class="action-stack">
+        <a class="action-link" routerLink="/admin/vehiculos">
+          <i class="bi bi-person-vcard"></i>
+          <div>
+            <strong>Registrar cliente y vehículo</strong>
+            <span>Crear el maestro administrativo de forma segura.</span>
+          </div>
+        </a>
+
+        <div class="action-link action-link--static">
+          <i class="bi bi-shield-lock"></i>
+          <div>
+            <strong>Sesión con trazabilidad</strong>
+            <span>Tu identidad queda ligada a cada movimiento operativo.</span>
+          </div>
+        </div>
+
+        <div class="action-link action-link--static">
+          <i class="bi bi-graph-up-arrow"></i>
+          <div>
+            <strong>Monitoreo del día</strong>
+            <span>Resumen de ocupación, ingresos y vencimientos visibles al instante.</span>
+          </div>
+        </div>
+      </div>
+    </article>
   </div>
 </section>

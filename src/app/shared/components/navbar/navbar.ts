@@ -1,5 +1,5 @@
 import { Component, computed, inject } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { Auth } from '../../../core/services/auth';
 
 @Component({
@@ -10,11 +10,13 @@ import { Auth } from '../../../core/services/auth';
 })
 export class Navbar {
   private readonly auth = inject(Auth);
+  private readonly router = inject(Router);
 
   protected readonly session = this.auth.session;
   protected readonly isAuthenticated = computed(() => this.auth.isAuthenticated());
 
   protected logout(): void {
     this.auth.logout();
+    void this.router.navigateByUrl('/login');
   }
 }
