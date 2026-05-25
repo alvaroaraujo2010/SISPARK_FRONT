@@ -1,4 +1,4 @@
-import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { CommonModule, CurrencyPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -20,7 +20,7 @@ import {
 } from '../../../../shared/components/parking-ticket-print/parking-ticket-print';
 import { AdminService } from '../../../../core/services/admin';
 import { roleLabel } from '../../../../core/auth/roles';
-import { COLOMBIA_DATE_FORMAT, COLOMBIA_TIMEZONE } from '../../../../core/date/colombia-time';
+import { ColombiaDatePipe } from '../../../../core/date/colombia-date.pipe';
 import { Auth } from '../../../../core/services/auth';
 import { Parking } from '../../../../core/services/parking';
 import { ChannelAssistant } from '../../../channel/components/channel-assistant/channel-assistant';
@@ -52,7 +52,7 @@ function formatCop(amount: number): string {
   imports: [
     CommonModule,
     CurrencyPipe,
-    DatePipe,
+    ColombiaDatePipe,
     ReactiveFormsModule,
     RouterLink,
     ChannelAssistant,
@@ -70,8 +70,6 @@ export class HomePage {
 
   protected readonly session = this.auth.session;
   protected readonly roleLabel = roleLabel;
-  protected readonly colombiaTimezone = COLOMBIA_TIMEZONE;
-  protected readonly colombiaDateFormat = COLOMBIA_DATE_FORMAT;
   protected readonly reprintingRegistrationId = signal<number | null>(null);
 
   protected readonly dashboardResource = rxResource<DashboardSummary, number>({
@@ -239,6 +237,8 @@ export class HomePage {
         this.movementPreview.set(null);
         this.selectedVehicleTypeId.set(null);
         this.boardRefresh.bump();
+        this.vehiclesResource.reload();
+        this.dashboardResource.reload();
 
         if (response.action === 'entry' && response.entryTicket) {
           this.printPrompt.set({ mode: 'entry', entryTicket: response.entryTicket });

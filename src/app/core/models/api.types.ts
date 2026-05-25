@@ -47,7 +47,7 @@ export type VehicleRegistrationResult = {
 export type ActiveVehicle = {
   idRegistro: number;
   placa: string;
-  fechaIngreso: string;
+  fechaIngreso: string | null;
   fechaSalida: string | null;
   valorPagar: number;
   tipoServicio: string;
@@ -58,7 +58,7 @@ export type ParkingBoardVehicle = {
   placa: string;
   tipoVehiculo: string;
   tipoServicio: string;
-  fechaIngreso: string;
+  fechaIngreso: string | null;
   fechaSalida: string | null;
   valorPagar: number;
   estado: 'Activo' | 'Salió' | 'Inactivo' | 'Registrado';

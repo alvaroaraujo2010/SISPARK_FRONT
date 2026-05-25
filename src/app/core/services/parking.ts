@@ -49,7 +49,7 @@ export class Parking {
       placa: vehicle.placa,
       tipoVehiculo: '—',
       tipoServicio: vehicle.tipoServicio,
-      fechaIngreso: vehicle.fechaIngreso,
+      fechaIngreso: vehicle.fechaIngreso ?? null,
       fechaSalida: vehicle.fechaSalida,
       valorPagar: vehicle.valorPagar,
       estado: vehicle.fechaSalida ? 'Salió' : 'Activo',

@@ -1,6 +1,6 @@
-import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { CommonModule, CurrencyPipe } from '@angular/common';
 import { Component, computed, input } from '@angular/core';
-import { COLOMBIA_DATE_FORMAT, COLOMBIA_TIMEZONE } from '../../../core/date/colombia-time';
+import { ColombiaDatePipe } from '../../../core/date/colombia-date.pipe';
 import type { EntryTicket, ExitTicket } from '../../../core/models/api.types';
 
 export type ParkingTicketMode = 'entry' | 'exit';
@@ -61,14 +61,11 @@ const PRINT_STYLES = `
 
 @Component({
   selector: 'app-parking-ticket-print',
-  imports: [CommonModule, CurrencyPipe, DatePipe],
+  imports: [CommonModule, CurrencyPipe, ColombiaDatePipe],
   templateUrl: './parking-ticket-print.html',
   styleUrl: './parking-ticket-print.scss',
 })
 export class ParkingTicketPrint {
-  protected readonly colombiaTimezone = COLOMBIA_TIMEZONE;
-  protected readonly colombiaDateFormat = COLOMBIA_DATE_FORMAT;
-
   readonly mode = input.required<ParkingTicketMode>();
   readonly entryTicket = input<EntryTicket | null>(null);
   readonly exitTicket = input<ExitTicket | null>(null);

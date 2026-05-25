@@ -199,7 +199,7 @@
     <div class="section-heading section-heading--split">
       <div>
         <h2>Listado de vehículos</h2>
-        <p>Activos en parqueadero, salidas de hoy (hora Colombia), registrados en maestro e inactivos.</p>
+        <p>Activos, salidas de los últimos 30 días (hora Colombia), registrados sin ingreso e inactivos.</p>
       </div>
 
       <div class="table-toolbar">
@@ -276,14 +276,8 @@
               <td>
                 <span class="service-chip">{{ vehicle.tipoServicio }}</span>
               </td>
-              <td>{{ vehicle.fechaIngreso | date: colombiaDateFormat : colombiaTimezone }}</td>
-              <td>
-                {{
-                  vehicle.fechaSalida
-                    ? (vehicle.fechaSalida | date: colombiaDateFormat : colombiaTimezone)
-                    : '—'
-                }}
-              </td>
+              <td>{{ vehicle.fechaIngreso ? (vehicle.fechaIngreso | colombiaDate) : '—' }}</td>
+              <td>{{ vehicle.fechaSalida ? (vehicle.fechaSalida | colombiaDate) : '—' }}</td>
               <td>
                 @if (vehicle.estado === 'Salió') {
                   {{ vehicle.valorPagar | currency: 'COP' : 'symbol' : '1.0-0' }}

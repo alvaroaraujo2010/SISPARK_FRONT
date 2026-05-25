@@ -10,7 +10,7 @@
     <dl class="entry-ticket__rows">
       <div><dt>Ticket No.</dt><dd>{{ ticket.registrationId }}</dd></div>
       <div><dt>Placa</dt><dd class="entry-ticket__plate">{{ ticket.plate }}</dd></div>
-      <div><dt>Ingreso</dt><dd>{{ ticket.entryAt | date: colombiaDateFormat : colombiaTimezone }}</dd></div>
+      <div><dt>Ingreso</dt><dd>{{ ticket.entryAt | colombiaDate }}</dd></div>
       <div><dt>Tipo vehículo</dt><dd>{{ ticket.vehicleType }}</dd></div>
       <div><dt>Servicio</dt><dd>{{ ticket.serviceType }}</dd></div>
       <div><dt>Tarifa</dt><dd>{{ rateLabel() }}</dd></div>
@@ -39,8 +39,8 @@
     <dl class="entry-ticket__rows">
       <div><dt>Ticket No.</dt><dd>{{ ticket.registrationId }}</dd></div>
       <div><dt>Placa</dt><dd class="entry-ticket__plate">{{ ticket.plate }}</dd></div>
-      <div><dt>Ingreso</dt><dd>{{ ticket.entryAt | date: colombiaDateFormat : colombiaTimezone }}</dd></div>
-      <div><dt>Salida</dt><dd>{{ ticket.exitAt | date: colombiaDateFormat : colombiaTimezone }}</dd></div>
+      <div><dt>Ingreso</dt><dd>{{ ticket.entryAt | colombiaDate }}</dd></div>
+      <div><dt>Salida</dt><dd>{{ ticket.exitAt | colombiaDate }}</dd></div>
       <div><dt>Tiempo</dt><dd>{{ ticket.minutesConsumed }} min</dd></div>
       <div><dt>Tarifa</dt><dd>{{ rateLabel() }}</dd></div>
       <div><dt>Total</dt><dd class="entry-ticket__plate">{{ ticket.totalToPay | currency: 'COP' : 'symbol' : '1.0-0' }}</dd></div>
