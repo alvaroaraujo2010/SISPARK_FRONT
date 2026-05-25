@@ -5,10 +5,11 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { getHttpErrorMessage } from '../../../../core/http/problem-details';
 import { AdminService, VehicleType } from '../../../../core/services/admin';
 import { Auth } from '../../../../core/services/auth';
+import { ChannelWhatsappLinks } from '../../../channel/components/channel-whatsapp-links/channel-whatsapp-links';
 
 @Component({
   selector: 'app-services-page',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, ChannelWhatsappLinks],
   templateUrl: './services-page.html',
   styleUrl: './services-page.scss',
 })

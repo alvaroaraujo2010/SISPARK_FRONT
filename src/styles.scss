@@ -120,7 +120,7 @@ textarea {
   margin: 0 auto;
 }
 
-/* Contenedor del logo PNG: fondo blanco, aire interno y tamano por contexto */
+/* Contenedor del logo (PNG/SVG): fondo blanco, aire interno y tamano por contexto */
 .logo-tile {
   display: inline-flex;
   align-items: center;
@@ -172,3 +172,5 @@ textarea {
     padding: 0.5rem;
   }
 }
+
+/* Tirilla: impresion via iframe en ParkingTicketPrint (no imprimir toda la pagina). */

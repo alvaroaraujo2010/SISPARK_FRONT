@@ -1,10 +1,13 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, catchError, map, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import type {
   ActiveVehicle,
+  ParkingBoardVehicle,
+  ParkingMovementPreview,
   ParkingMovementResult,
+  ReprintTicketResult,
   ParkingRegistrationPreviewPayload,
   ParkingRegistrationPreviewResult,
 } from '../models/api.types';
@@ -24,7 +27,48 @@ export class Parking {
     return this.http.get<ActiveVehicle[]>(`${this.apiUrl}/active`);
   }
 
-  registerEntryExit(plate: string): Observable<ParkingMovementResult> {
-    return this.http.post<ParkingMovementResult>(`${this.apiUrl}/entry-exit`, { plate });
+  getParkingBoard(): Observable<ParkingBoardVehicle[]> {
+    return this.http.get<ParkingBoardVehicle[]>(`${this.apiUrl}/board`).pipe(
+      catchError((error: HttpErrorResponse) => {
+        if (error.status !== 404) {
+          return throwError(() => error);
+        }
+
+        return this.getActiveVehicles().pipe(
+          map((vehicles) =>
+            vehicles.map((vehicle) => this.mapActiveToBoardRow(vehicle)),
+          ),
+        );
+      }),
+    );
+  }
+
+  private mapActiveToBoardRow(vehicle: ActiveVehicle): ParkingBoardVehicle {
+    return {
+      idRegistro: vehicle.idRegistro,
+      placa: vehicle.placa,
+      tipoVehiculo: '—',
+      tipoServicio: vehicle.tipoServicio,
+      fechaIngreso: vehicle.fechaIngreso,
+      fechaSalida: vehicle.fechaSalida,
+      valorPagar: vehicle.valorPagar,
+      estado: vehicle.fechaSalida ? 'Salió' : 'Activo',
+    };
+  }
+
+  getMovementPreview(plate: string): Observable<ParkingMovementPreview> {
+    const encoded = encodeURIComponent(plate.trim().toUpperCase());
+    return this.http.get<ParkingMovementPreview>(`${this.apiUrl}/plates/${encoded}/movement-preview`);
+  }
+
+  registerEntryExit(plate: string, vehicleTypeId?: number): Observable<ParkingMovementResult> {
+    return this.http.post<ParkingMovementResult>(`${this.apiUrl}/entry-exit`, {
+      plate,
+      vehicleTypeId: vehicleTypeId ?? null,
+    });
+  }
+
+  reprintTicket(registrationId: number): Observable<ReprintTicketResult> {
+    return this.http.get<ReprintTicketResult>(`${this.apiUrl}/registrations/${registrationId}/ticket`);
   }
 }

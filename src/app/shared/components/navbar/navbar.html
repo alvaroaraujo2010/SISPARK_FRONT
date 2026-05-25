@@ -1,8 +1,8 @@
 <header class="navbar-shell">
   <div class="container-shell navbar-shell__inner">
-    <a class="brand" routerLink="/admin/inicio">
+    <a class="brand" [routerLink]="homeLink()">
       <span class="logo-tile logo-tile--nav" aria-hidden="true">
-        <img src="images/logo_moderno_de_sispark.png" alt="" decoding="async" />
+        <img src="images/logo_moderno_de_sispark.png" alt="SisPark" decoding="async" />
       </span>
       <div>
         <span>SISPARK</span>
@@ -12,8 +12,17 @@
 
     <div class="navbar-shell__cluster">
       <nav class="nav-links">
-        <a routerLink="/admin/inicio" routerLinkActive="active">Inicio</a>
-        <a routerLink="/admin/vehiculos" routerLinkActive="active">Vehiculos</a>
+        @if (showOperations()) {
+          <a routerLink="/admin/inicio" routerLinkActive="active">Inicio</a>
+        }
+        @if (showAdminMenu()) {
+          <a routerLink="/admin/vehiculos" routerLinkActive="active">Vehiculos</a>
+          <a routerLink="/admin/parqueadero" routerLinkActive="active">Parqueadero</a>
+          <a routerLink="/admin/usuarios" routerLinkActive="active">Usuarios</a>
+        }
+        @if (showReports()) {
+          <a routerLink="/admin/reportes" routerLinkActive="active">Reportes</a>
+        }
       </nav>
 
       @if (isAuthenticated()) {
@@ -22,7 +31,7 @@
             <small>Sesion activa</small>
             <strong>{{ session()?.fullName }}</strong>
           </span>
-          <span class="nav-role">{{ session()?.role }}</span>
+          <span class="nav-role">{{ roleLabel(session()?.role) }}</span>
           <button class="nav-logout" type="button" (click)="logout()">Salir</button>
         </div>
       }

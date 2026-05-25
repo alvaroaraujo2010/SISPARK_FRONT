@@ -1,0 +1,78 @@
+<article class="channel-assistant">
+  <header class="channel-assistant__header">
+    <div>
+      <span class="section-kicker">Canal inteligente</span>
+      <h2>Asistente operativo</h2>
+    </div>
+    <i class="bi bi-robot" aria-hidden="true"></i>
+  </header>
+
+  <p class="channel-assistant__copy">
+    Mismas herramientas que WhatsApp, con bloques visuales permitidos en el panel.
+  </p>
+
+  <div class="channel-assistant__quick">
+    @for (cmd of quickCommands; track cmd.text) {
+      <button type="button" class="btn btn-sm btn-outline-dark" (click)="sendQuickCommand(cmd.text)">
+        {{ cmd.label }}
+      </button>
+    }
+  </div>
+
+  <div class="channel-assistant__thread" aria-live="polite">
+    @for (message of messages(); track $index) {
+      <div class="channel-assistant__bubble" [class.channel-assistant__bubble--user]="message.role === 'user'">
+        <p>{{ message.text }}</p>
+
+        @if (message.uiBlocks?.length) {
+          <app-channel-ui-blocks [blocks]="message.uiBlocks ?? []" />
+        }
+
+        @if (message.buttons?.length) {
+          <div class="channel-assistant__actions">
+            @for (button of message.buttons; track button.id) {
+              <button
+                type="button"
+                class="btn btn-sm btn-success"
+                [disabled]="isSending()"
+                (click)="onReplyButton(button.id, button.title)"
+              >
+                {{ button.title }}
+              </button>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  @if (error()) {
+    <div class="status-banner status-banner--danger" role="alert">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  @if (ticketForPrint()) {
+    <div class="ticket-print-host" aria-hidden="true">
+      <app-parking-ticket-print
+        [mode]="ticketForPrint()!.mode"
+        [entryTicket]="ticketForPrint()!.entry ?? null"
+        [exitTicket]="ticketForPrint()!.exit ?? null"
+      />
+    </div>
+  }
+
+  <form class="channel-assistant__form" [formGroup]="messageForm" (ngSubmit)="submitMessage()">
+    <input
+      class="form-control"
+      formControlName="text"
+      maxlength="1000"
+      placeholder="Escribe un comando o una placa..."
+      autocomplete="off"
+    />
+    <button class="btn btn-success" type="submit" [disabled]="isSending()">
+      {{ isSending() ? 'Enviando...' : 'Enviar' }}
+    </button>
+  </form>
+</article>

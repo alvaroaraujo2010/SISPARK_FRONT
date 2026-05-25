@@ -13,7 +13,7 @@
       <div class="session-oval" aria-label="Sesión activa">
         <span class="session-oval__label">Sesión activa</span>
         <strong class="session-oval__name">{{ session()?.fullName }}</strong>
-        <span class="session-oval__role">{{ session()?.role }}</span>
+        <span class="session-oval__role">{{ roleLabel(session()?.role) }}</span>
       </div>
     </div>
   </div>
@@ -31,8 +31,10 @@
       </div>
 
       <p class="operation-card__copy">
-        El registro operativo queda ligado al usuario autenticado y actualiza el tablero en tiempo
-        real.
+        Ingrese la placa para ingreso o salida. Si el vehiculo no esta registrado, debe indicar si es
+        <strong>Moto</strong> o <strong>Carro</strong> antes del ingreso (tarifa moto: $2.000 por hora o fraccion).
+        Para clientes con mensualidad o datos completos, el administrador puede registrar el vehiculo en
+        <a routerLink="/admin/vehiculos">Vehiculos</a>.
       </p>
 
       <form class="plate-form" [formGroup]="plateForm" (ngSubmit)="submitPlate()">
@@ -62,12 +64,81 @@
           </div>
         }
 
+        @if (movementPreview(); as preview) {
+          @if (preview.requiresVehicleType && isIngresoPending()) {
+            <div class="visitor-type-picker mt-3" role="group" aria-label="Tipo de vehiculo para ingreso">
+              <p class="visitor-type-picker__label">
+                Ingreso de {{ preview.plate }}: indique si es <strong>Moto</strong> o <strong>Carro</strong>
+                (tarifa moto $2.000 / fracción).
+              </p>
+              <div class="visitor-type-picker__actions">
+                @for (option of preview.visitorVehicleTypes; track option.id) {
+                  <button
+                    class="btn"
+                    type="button"
+                    [class.btn-success]="selectedVehicleTypeId() === option.id"
+                    [class.btn-outline-dark]="selectedVehicleTypeId() !== option.id"
+                    (click)="selectVisitorVehicleType(option)"
+                  >
+                    {{ option.name }}
+                  </button>
+                }
+              </div>
+            </div>
+          }
+
+          @if (canConfirmMovement()) {
+            <div class="movement-confirm mt-3">
+              <p class="movement-confirm__label">{{ pendingActionLabel() }}</p>
+              <div class="movement-confirm__actions">
+                <button
+                  class="btn btn-success btn-sm"
+                  type="button"
+                  [disabled]="isSubmittingMovement()"
+                  (click)="confirmMovement()"
+                >
+                  {{ isSubmittingMovement() ? 'Procesando...' : 'Confirmar' }}
+                </button>
+                <button
+                  class="btn btn-outline-dark btn-sm"
+                  type="button"
+                  [disabled]="isSubmittingMovement()"
+                  (click)="cancelMovementFlow()"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          }
+        }
+
+        @if (printPrompt()) {
+          <div class="print-prompt mt-3" role="dialog" aria-labelledby="print-prompt-title">
+            <p id="print-prompt-title" class="print-prompt__title">
+              {{
+                printPrompt()!.mode === 'entry'
+                  ? '¿Desea imprimir la tirilla de ingreso?'
+                  : '¿Desea imprimir la tirilla de salida?'
+              }}
+            </p>
+            <div class="print-prompt__actions">
+              <button class="btn btn-success btn-sm" type="button" (click)="confirmPrint()">Sí, imprimir</button>
+              <button class="btn btn-outline-dark btn-sm" type="button" (click)="dismissPrint()">No, gracias</button>
+            </div>
+          </div>
+
+          <div class="ticket-print-host" aria-hidden="true">
+            <app-parking-ticket-print
+              [mode]="printPrompt()!.mode"
+              [entryTicket]="printPrompt()!.entryTicket ?? null"
+              [exitTicket]="printPrompt()!.exitTicket ?? null"
+            />
+          </div>
+        }
+
         <div class="plate-form__actions">
-          <button class="btn btn-success" type="submit" [disabled]="isSubmittingMovement()">
+          <button class="btn btn-success" type="submit" [disabled]="isSubmittingMovement() || movementPreview()">
             {{ isSubmittingMovement() ? 'Procesando...' : 'Validar placa' }}
-          </button>
-          <button class="btn btn-outline-dark" type="button" (click)="refreshBoard()">
-            Actualizar tablero
           </button>
         </div>
       </form>
@@ -127,8 +198,8 @@
   <div class="container-shell">
     <div class="section-heading section-heading--split">
       <div>
-        <h2>Vehículos en parqueadero</h2>
-        <p>Vista operativa conectada al backend real de SISPARK.</p>
+        <h2>Listado de vehículos</h2>
+        <p>Activos en parqueadero, salidas de hoy (hora Colombia), registrados en maestro e inactivos.</p>
       </div>
 
       <div class="table-toolbar">
@@ -137,11 +208,11 @@
           <input
             type="text"
             class="form-control"
-            placeholder="Buscar por placa o servicio"
+            placeholder="Buscar por placa, servicio o estado"
             (input)="updateSearch($any($event.target).value)"
           />
         </label>
-        <span class="table-count">{{ filteredActiveVehicles().length }} visibles</span>
+        <span class="table-count">{{ filteredBoardVehicles().length }} visibles</span>
       </div>
     </div>
 
@@ -157,22 +228,25 @@
         <thead>
           <tr>
             <th>Placa</th>
+            <th>Estado</th>
+            <th>Tipo</th>
             <th>Servicio</th>
             <th>Fecha de ingreso</th>
             <th>Fecha de salida</th>
             <th>Valor a pagar</th>
+            <th class="text-end">Acciones</th>
           </tr>
         </thead>
         <tbody>
           @if (vehiclesResource.isLoading()) {
             <tr>
-              <td colspan="5" class="text-center py-4">Cargando vehículos...</td>
+              <td colspan="8" class="text-center py-4">Cargando vehículos...</td>
             </tr>
           }
 
-          @if (!vehiclesResource.isLoading() && filteredActiveVehicles().length === 0) {
+          @if (!vehiclesResource.isLoading() && filteredBoardVehicles().length === 0) {
             <tr>
-              <td colspan="5" class="empty-row">
+              <td colspan="8" class="empty-row">
                 <div class="empty-state">
                   <i class="bi bi-inboxes-fill"></i>
                   <strong>No hay resultados para la vista actual.</strong>
@@ -182,22 +256,74 @@
             </tr>
           }
 
-          @for (vehicle of filteredActiveVehicles(); track vehicle.idRegistro) {
+          @for (vehicle of filteredBoardVehicles(); track vehicle.placa + '-' + vehicle.idRegistro + '-' + vehicle.estado) {
             <tr>
               <td>
                 <span class="plate-badge">{{ vehicle.placa }}</span>
               </td>
               <td>
+                <span
+                  class="status-chip"
+                  [class.status-chip--active]="vehicle.estado === 'Activo'"
+                  [class.status-chip--exited]="vehicle.estado === 'Salió'"
+                  [class.status-chip--inactive]="vehicle.estado === 'Inactivo'"
+                  [class.status-chip--registered]="vehicle.estado === 'Registrado'"
+                >
+                  {{ vehicle.estado }}
+                </span>
+              </td>
+              <td>{{ vehicle.tipoVehiculo }}</td>
+              <td>
                 <span class="service-chip">{{ vehicle.tipoServicio }}</span>
               </td>
-              <td>{{ vehicle.fechaIngreso | date: 'dd/MM/yyyy HH:mm' }}</td>
-              <td>{{ vehicle.fechaSalida ? (vehicle.fechaSalida | date: 'dd/MM/yyyy HH:mm') : '--' }}</td>
-              <td>{{ vehicle.valorPagar | currency: 'COP' : 'symbol' : '1.0-0' }}</td>
+              <td>{{ vehicle.fechaIngreso | date: colombiaDateFormat : colombiaTimezone }}</td>
+              <td>
+                {{
+                  vehicle.fechaSalida
+                    ? (vehicle.fechaSalida | date: colombiaDateFormat : colombiaTimezone)
+                    : '—'
+                }}
+              </td>
+              <td>
+                @if (vehicle.estado === 'Salió') {
+                  {{ vehicle.valorPagar | currency: 'COP' : 'symbol' : '1.0-0' }}
+                } @else if (vehicle.estado === 'Activo') {
+                  —
+                } @else {
+                  —
+                }
+              </td>
+              <td class="text-end">
+                @if (canReprintTicket(vehicle)) {
+                  <button
+                    class="btn btn-sm btn-outline-dark"
+                    type="button"
+                    [disabled]="reprintingRegistrationId() === vehicle.idRegistro"
+                    (click)="reprintTicket(vehicle)"
+                  >
+                    {{
+                      reprintingRegistrationId() === vehicle.idRegistro
+                        ? 'Preparando...'
+                        : vehicle.estado === 'Activo'
+                          ? 'Tirilla ingreso'
+                          : 'Tirilla salida'
+                    }}
+                  </button>
+                } @else {
+                  <span class="text-muted">—</span>
+                }
+              </td>
             </tr>
           }
         </tbody>
       </table>
     </div>
+  </div>
+</section>
+
+<section class="assistant-section">
+  <div class="container-shell">
+    <app-channel-assistant />
   </div>
 </section>
 
@@ -240,3 +366,41 @@
     </article>
   </div>
 </section>
+
+@if (reprintDialog(); as dialog) {
+  <div
+    class="ticket-modal-backdrop"
+    role="presentation"
+    (click)="dismissReprintDialog()"
+  >
+    <div
+      class="ticket-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="reprint-dialog-title"
+      (click)="$event.stopPropagation()"
+    >
+      @if (dialog.errorMessage) {
+        <p id="reprint-dialog-title" class="ticket-modal__title">{{ dialog.errorMessage }}</p>
+        <div class="ticket-modal__actions">
+          <button class="btn btn-dark" type="button" (click)="dismissReprintDialog()">Cerrar</button>
+        </div>
+      } @else {
+        <p id="reprint-dialog-title" class="ticket-modal__title">{{ reprintDialogTitle() }}</p>
+        <div class="ticket-modal__actions">
+          <button class="btn btn-success" type="button" (click)="confirmReprintPrint()">Sí</button>
+          <button class="btn btn-outline-dark" type="button" (click)="dismissReprintDialog()">No</button>
+        </div>
+
+        <div class="ticket-print-host" aria-hidden="true">
+          <app-parking-ticket-print
+            #reprintTicketPrint
+            [mode]="dialog.mode"
+            [entryTicket]="dialog.entryTicket ?? null"
+            [exitTicket]="dialog.exitTicket ?? null"
+          />
+        </div>
+      }
+    </div>
+  </div>
+}

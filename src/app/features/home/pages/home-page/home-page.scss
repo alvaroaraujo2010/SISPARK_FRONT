@@ -1,3 +1,84 @@
+.assistant-section {
+  padding: 0 0 1.5rem;
+}
+
+.visitor-type-picker__label,
+.movement-confirm__label {
+  margin: 0 0 0.5rem;
+  font-weight: 600;
+}
+
+.visitor-type-picker__actions,
+.movement-confirm__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.print-prompt {
+  padding: 0.85rem 1rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(0, 204, 102, 0.35);
+  background: rgba(0, 204, 102, 0.08);
+}
+
+.print-prompt__title {
+  margin: 0 0 0.65rem;
+  font-weight: 600;
+}
+
+.print-prompt__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.ticket-print-host {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.ticket-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.55);
+}
+
+.ticket-modal {
+  width: min(100%, 22rem);
+  padding: 1.35rem 1.25rem;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.22);
+}
+
+.ticket-modal__title {
+  margin: 0 0 1rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.ticket-modal__actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.65rem;
+}
+
+.ticket-modal__actions .btn {
+  min-width: 5.5rem;
+}
+
 .command-shell {
   padding: 2rem 0 0.5rem;
 }
@@ -318,6 +399,35 @@
 .service-chip {
   background: var(--sp-green-soft);
   color: #0b6d3d;
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.status-chip--active {
+  background: rgba(0, 204, 102, 0.16);
+  color: #0b6d3d;
+}
+
+.status-chip--exited {
+  background: rgba(47, 54, 56, 0.1);
+  color: #2f3638;
+}
+
+.status-chip--inactive {
+  background: rgba(180, 52, 52, 0.12);
+  color: #9b2c2c;
+}
+
+.status-chip--registered {
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
 }
 
 .empty-row {

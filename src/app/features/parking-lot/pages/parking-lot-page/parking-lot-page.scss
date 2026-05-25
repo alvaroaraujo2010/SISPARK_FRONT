@@ -1,0 +1,38 @@
+.parking-lot-page {
+  padding: 2rem 0 3rem;
+}
+
+.parking-lot-page__header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  h1 {
+    margin: 0.35rem 0;
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+  }
+
+  p {
+    color: var(--sp-muted);
+    max-width: 640px;
+    margin: 0;
+  }
+}
+
+.session-oval--compact {
+  padding: 0.75rem 1rem;
+}
+
+.parking-lot-card {
+  background: #fff;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  padding: 1.5rem;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
+}
+
+.parking-lot-card__actions {
+  margin-top: 1.25rem;
+}

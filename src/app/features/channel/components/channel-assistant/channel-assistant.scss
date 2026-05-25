@@ -1,0 +1,87 @@
+.channel-assistant {
+  border-radius: 1.25rem;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: #fff;
+  padding: 1.25rem;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
+}
+
+.channel-assistant__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+
+  h2 {
+    margin: 0.25rem 0 0;
+    font-size: 1.35rem;
+  }
+
+  i {
+    font-size: 1.5rem;
+    color: #0d7f47;
+  }
+}
+
+.channel-assistant__copy {
+  color: var(--sp-muted);
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+}
+
+.channel-assistant__quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.channel-assistant__thread {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  max-height: 360px;
+  overflow: auto;
+  padding: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.channel-assistant__bubble {
+  align-self: flex-start;
+  max-width: 92%;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.85rem;
+  background: rgba(15, 23, 42, 0.05);
+
+  p {
+    margin: 0 0 0.5rem;
+    white-space: pre-wrap;
+  }
+
+  &--user {
+    align-self: flex-end;
+    background: rgba(0, 204, 102, 0.16);
+  }
+}
+
+.channel-assistant__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.channel-assistant__form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.5rem;
+}
+
+.ticket-print-host {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}

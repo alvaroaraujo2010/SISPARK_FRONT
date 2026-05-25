@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 360" fill="none" role="img" aria-labelledby="sisparkLogoTitle">
+  <title id="sisparkLogoTitle">SisPark</title>
+  <!-- Isotipo: P verde + auto gris -->
+  <path
+    fill="#4CAF50"
+    d="M88 24h108c52 0 88 32 88 84 0 46-28 76-72 82l52 98h-62l-48-92h-28v92H88V24zm108 134c28 0 46-18 46-50 0-32-18-50-46-50H128v100h68z"
+  />
+  <path
+    fill="#2F3638"
+    d="M118 198h164c6 0 11 4 13 10l14 36h44l10 28H148l-10-28h44l14-36c2-6 7-10 13-10zm20 48h124v18H138v-18zm28-36h68v14h-68v-14z"
+  />
+  <path fill="#2F3638" d="M148 210h104c8 0 14 6 14 14v8H134v-8c0-8 6-14 14-14z" opacity=".85"/>
+  <text
+    x="200"
+    y="328"
+    text-anchor="middle"
+    font-family="Segoe UI, system-ui, -apple-system, sans-serif"
+    font-size="52"
+    font-weight="600"
+    fill="#2F3638"
+    letter-spacing="-0.02em"
+  >SisPark</text>
+</svg>

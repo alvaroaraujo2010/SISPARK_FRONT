@@ -1,0 +1,58 @@
+@if (mode() === 'entry' && entryTicket(); as ticket) {
+  <section class="entry-ticket" id="parking-ticket-print-area">
+    <header class="entry-ticket__header">
+      <strong>{{ ticket.parkingLotName }}</strong>
+      <span>{{ ticket.address }}</span>
+    </header>
+
+    <p class="entry-ticket__title">COMPROBANTE DE INGRESO</p>
+
+    <dl class="entry-ticket__rows">
+      <div><dt>Ticket No.</dt><dd>{{ ticket.registrationId }}</dd></div>
+      <div><dt>Placa</dt><dd class="entry-ticket__plate">{{ ticket.plate }}</dd></div>
+      <div><dt>Ingreso</dt><dd>{{ ticket.entryAt | date: colombiaDateFormat : colombiaTimezone }}</dd></div>
+      <div><dt>Tipo vehículo</dt><dd>{{ ticket.vehicleType }}</dd></div>
+      <div><dt>Servicio</dt><dd>{{ ticket.serviceType }}</dd></div>
+      <div><dt>Tarifa</dt><dd>{{ rateLabel() }}</dd></div>
+      <div><dt>Operador</dt><dd>{{ ticket.operatorName }}</dd></div>
+      @if (ticket.phone) {
+        <div><dt>Teléfono</dt><dd>{{ ticket.phone }}</dd></div>
+      }
+      @if (ticket.mobilePhone) {
+        <div><dt>Celular</dt><dd>{{ ticket.mobilePhone }}</dd></div>
+      }
+    </dl>
+
+    <footer class="entry-ticket__footer">Conserve este comprobante para su salida. SISPARK.</footer>
+  </section>
+}
+
+@if (mode() === 'exit' && exitTicket(); as ticket) {
+  <section class="entry-ticket" id="parking-ticket-print-area">
+    <header class="entry-ticket__header">
+      <strong>{{ ticket.parkingLotName }}</strong>
+      <span>{{ ticket.address }}</span>
+    </header>
+
+    <p class="entry-ticket__title">COMPROBANTE DE SALIDA</p>
+
+    <dl class="entry-ticket__rows">
+      <div><dt>Ticket No.</dt><dd>{{ ticket.registrationId }}</dd></div>
+      <div><dt>Placa</dt><dd class="entry-ticket__plate">{{ ticket.plate }}</dd></div>
+      <div><dt>Ingreso</dt><dd>{{ ticket.entryAt | date: colombiaDateFormat : colombiaTimezone }}</dd></div>
+      <div><dt>Salida</dt><dd>{{ ticket.exitAt | date: colombiaDateFormat : colombiaTimezone }}</dd></div>
+      <div><dt>Tiempo</dt><dd>{{ ticket.minutesConsumed }} min</dd></div>
+      <div><dt>Tarifa</dt><dd>{{ rateLabel() }}</dd></div>
+      <div><dt>Total</dt><dd class="entry-ticket__plate">{{ ticket.totalToPay | currency: 'COP' : 'symbol' : '1.0-0' }}</dd></div>
+      <div><dt>Operador</dt><dd>{{ ticket.operatorName }}</dd></div>
+      @if (ticket.phone) {
+        <div><dt>Teléfono</dt><dd>{{ ticket.phone }}</dd></div>
+      }
+      @if (ticket.mobilePhone) {
+        <div><dt>Celular</dt><dd>{{ ticket.mobilePhone }}</dd></div>
+      }
+    </dl>
+
+    <footer class="entry-ticket__footer">Gracias por su visita. SISPARK.</footer>
+  </section>
+}

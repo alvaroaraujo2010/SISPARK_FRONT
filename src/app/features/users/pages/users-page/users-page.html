@@ -1,0 +1,136 @@
+<section class="users-page">
+  <div class="container-shell">
+    <header class="users-page__header">
+      <div>
+        <span class="section-kicker">Seguridad</span>
+        <h1>Usuarios del sistema</h1>
+        <p>
+          Cree cuentas para el equipo. <strong>Administrador</strong> tiene acceso total;
+          <strong>Operario</strong> solo ingreso, salida y WhatsApp;
+          <strong>Supervisor</strong> consultará reportes mensuales (próximamente).
+        </p>
+      </div>
+      <div class="session-oval session-oval--compact">
+        <span class="session-oval__label">Sesión</span>
+        <strong class="session-oval__name">{{ session()?.fullName }}</strong>
+      </div>
+    </header>
+
+    @if (loadError()) {
+      <div class="status-banner status-banner--danger" role="alert">{{ loadError() }}</div>
+    }
+
+    <div class="users-page__grid">
+      <article class="users-card">
+        <h2>Nuevo usuario</h2>
+        <form [formGroup]="userForm" (ngSubmit)="submit()">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" for="user-first-name">Nombres</label>
+              <input id="user-first-name" class="form-control" formControlName="firstName" maxlength="100" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="user-last-name">Apellidos</label>
+              <input id="user-last-name" class="form-control" formControlName="lastName" maxlength="100" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="user-username">Usuario de acceso</label>
+              <input
+                id="user-username"
+                class="form-control text-lowercase"
+                formControlName="username"
+                maxlength="50"
+                autocomplete="off"
+              />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="user-email">Correo (opcional)</label>
+              <input id="user-email" class="form-control" type="email" formControlName="email" maxlength="120" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="user-password">Contraseña inicial</label>
+              <input
+                id="user-password"
+                class="form-control"
+                type="password"
+                formControlName="password"
+                minlength="6"
+                autocomplete="new-password"
+              />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="user-role">Tipo de usuario</label>
+              <select id="user-role" class="form-select" formControlName="roleId">
+                <option [ngValue]="0" disabled>Seleccione un rol</option>
+                @for (role of rolesResource.value(); track role.id) {
+                  <option [ngValue]="role.id">
+                    {{ roleLabel(role.name) }} — {{ role.description }}
+                  </option>
+                }
+              </select>
+            </div>
+          </div>
+
+          @if (error()) {
+            <div class="status-banner status-banner--danger mt-3" role="alert">{{ error() }}</div>
+          }
+          @if (feedback()) {
+            <div class="status-banner status-banner--success mt-3" role="alert">{{ feedback() }}</div>
+          }
+
+          <div class="users-card__actions">
+            <button class="btn btn-success" type="submit" [disabled]="isSaving() || userForm.invalid">
+              {{ isSaving() ? 'Guardando...' : 'Crear usuario' }}
+            </button>
+          </div>
+        </form>
+      </article>
+
+      <article class="users-card">
+        <h2>Usuarios registrados</h2>
+        @if (usersResource.isLoading()) {
+          <p class="text-muted">Cargando...</p>
+        } @else if ((usersResource.value()?.length ?? 0) === 0) {
+          <p class="text-muted">Aún no hay usuarios además del administrador inicial.</p>
+        } @else {
+          <div class="table-responsive">
+            <table class="table table-sm align-middle">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Usuario</th>
+                  <th>Rol</th>
+                  <th>Estado</th>
+                  <th>Último acceso</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (user of usersResource.value(); track user.id) {
+                  <tr>
+                    <td>{{ user.firstName }} {{ user.lastName }}</td>
+                    <td><code>{{ user.username }}</code></td>
+                    <td>{{ roleLabel(user.roleName) }}</td>
+                    <td>
+                      @if (user.isActive) {
+                        <span class="badge text-bg-success">Activo</span>
+                      } @else {
+                        <span class="badge text-bg-secondary">Inactivo</span>
+                      }
+                    </td>
+                    <td>
+                      @if (user.lastAccess) {
+                        {{ user.lastAccess | date: 'short' }}
+                      } @else {
+                        <span class="text-muted">Sin acceso</span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </article>
+    </div>
+  </div>
+</section>

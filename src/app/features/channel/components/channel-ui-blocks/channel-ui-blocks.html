@@ -1,0 +1,42 @@
+<div class="channel-ui-blocks">
+  @for (block of blocks(); track $index) {
+    @switch (block.type) {
+      @case ('summary_cards') {
+        <div class="channel-ui-blocks__summary">
+          <article>
+            <span>Activos</span>
+            <strong>{{ asSummary(block.props).activeVehicles ?? 0 }}</strong>
+          </article>
+          <article>
+            <span>Cupos</span>
+            <strong>{{ asSummary(block.props).availableSpots ?? 0 }}</strong>
+          </article>
+          <article>
+            <span>Recaudo</span>
+            <strong>{{ asSummary(block.props).dailyRevenue ?? 0 | currency: 'COP' : 'symbol' : '1.0-0' }}</strong>
+          </article>
+          <article>
+            <span>Mensualidades</span>
+            <strong>{{ asSummary(block.props).monthlyDueSoon ?? 0 }}</strong>
+          </article>
+        </div>
+      }
+      @case ('active_vehicles_list') {
+        <div class="channel-ui-blocks__list">
+          <header>{{ vehicleCount(block.props) }} vehiculos activos</header>
+          <ul>
+            @for (item of asVehicleItems(block.props); track item.plate) {
+              <li>
+                <strong>{{ item.plate }}</strong>
+                <span>{{ item.serviceType }}</span>
+              </li>
+            }
+          </ul>
+        </div>
+      }
+      @default {
+        <p class="channel-ui-blocks__unknown">Bloque no soportado: {{ block.type }}</p>
+      }
+    }
+  }
+</div>

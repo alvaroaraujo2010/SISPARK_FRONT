@@ -4,6 +4,8 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import type {
   DashboardSummary,
+  ParkingLot,
+  UpdateParkingLotPayload,
   VehicleRegistrationPayload,
   VehicleRegistrationResult,
   VehicleType,
@@ -28,5 +30,13 @@ export class AdminService {
 
   registerVehicle(payload: VehicleRegistrationPayload): Observable<VehicleRegistrationResult> {
     return this.http.post<VehicleRegistrationResult>(`${this.apiUrl}/vehicle-registrations`, payload);
+  }
+
+  getParkingLot(): Observable<ParkingLot> {
+    return this.http.get<ParkingLot>(`${this.apiUrl}/parking-lot`);
+  }
+
+  updateParkingLot(payload: UpdateParkingLotPayload): Observable<ParkingLot> {
+    return this.http.put<ParkingLot>(`${this.apiUrl}/parking-lot`, payload);
   }
 }

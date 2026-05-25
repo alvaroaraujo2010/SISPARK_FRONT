@@ -1,0 +1,28 @@
+<section class="reports-page">
+  <div class="container-shell">
+    <header class="reports-page__header">
+      <div>
+        <span class="section-kicker">Supervisión</span>
+        <h1>Reportes mensuales</h1>
+        <p>
+          Módulo reservado para el perfil <strong>Supervisor</strong>. Aquí se publicará el reporte
+          mensual consolidado (mensualidades, ingresos y ocupación).
+        </p>
+      </div>
+      <div class="session-oval session-oval--compact">
+        <span class="session-oval__label">Sesión</span>
+        <strong class="session-oval__name">{{ session()?.fullName }}</strong>
+        <span class="session-oval__role">{{ roleLabel(session()?.role) }}</span>
+      </div>
+    </header>
+
+    <article class="reports-placeholder">
+      <i class="bi bi-bar-chart-line" aria-hidden="true"></i>
+      <h2>Próximamente</h2>
+      <p>
+        Mientras tanto puede consultar mensualidades por vencer desde el asistente de canal
+        (comando <em>mensualidades</em>) si tiene permisos de supervisión.
+      </p>
+    </article>
+  </div>
+</section>

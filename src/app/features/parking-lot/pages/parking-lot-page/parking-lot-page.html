@@ -1,0 +1,96 @@
+<section class="parking-lot-page">
+  <div class="container-shell">
+    <header class="parking-lot-page__header">
+      <div>
+        <span class="section-kicker">Administración</span>
+        <h1>Datos del parqueadero</h1>
+        <p>
+          Configure cupos, tarifas y datos que aparecen en las tirillas. Cada ingreso descuenta un cupo; la salida lo libera.
+        </p>
+      </div>
+      <div class="session-oval session-oval--compact">
+        <span class="session-oval__label">Sesión</span>
+        <strong class="session-oval__name">{{ session()?.fullName }}</strong>
+      </div>
+    </header>
+
+    @if (loadError()) {
+      <div class="status-banner status-banner--danger" role="alert">{{ loadError() }}</div>
+    }
+
+    <article class="parking-lot-card">
+      <form [formGroup]="lotForm" (ngSubmit)="submit()">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label" for="lot-name">Nombre del parqueadero</label>
+            <input id="lot-name" class="form-control" formControlName="name" maxlength="120" />
+          </div>
+
+          <div class="col-12">
+            <label class="form-label" for="lot-address">Dirección</label>
+            <input id="lot-address" class="form-control" formControlName="address" maxlength="200" />
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label" for="lot-phone">Teléfono fijo</label>
+            <input id="lot-phone" class="form-control" formControlName="phone" maxlength="30" />
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label" for="lot-capacity">Capacidad total (cupos)</label>
+            <input
+              id="lot-capacity"
+              class="form-control"
+              type="number"
+              formControlName="totalCapacity"
+              min="1"
+              max="10000"
+            />
+            <small class="text-muted">
+              Vehículos que pueden ingresar a la vez. Ahora:
+              {{ lotResource.value()?.activeVehicles ?? 0 }} dentro,
+              {{ lotResource.value()?.availableSpots ?? 0 }} disponibles.
+            </small>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label" for="lot-rate">Valor por fracción (COP)</label>
+            <input id="lot-rate" class="form-control" type="number" formControlName="hourlyRate" min="0.01" step="1" />
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label" for="lot-fraction">Fracción (minutos)</label>
+            <input id="lot-fraction" class="form-control" type="number" formControlName="fractionMinutes" min="1" max="1440" />
+            <small class="text-muted">Ejemplo: 60 = cobro por hora. Se imprime en la tirilla de ingreso y salida.</small>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label" for="lot-mobile">Celular / WhatsApp</label>
+            <input
+              id="lot-mobile"
+              class="form-control"
+              formControlName="mobilePhone"
+              maxlength="30"
+              placeholder="573001234567"
+            />
+            <small class="text-muted">Solo dígitos. Se usará en la tirilla y luego en el canal WhatsApp.</small>
+          </div>
+        </div>
+
+        @if (error()) {
+          <div class="status-banner status-banner--danger mt-3" role="alert">{{ error() }}</div>
+        }
+
+        @if (feedback()) {
+          <div class="status-banner status-banner--success mt-3" role="status">{{ feedback() }}</div>
+        }
+
+        <div class="parking-lot-card__actions">
+          <button class="btn btn-success" type="submit" [disabled]="isSaving() || lotResource.isLoading()">
+            {{ isSaving() ? 'Guardando...' : 'Guardar parqueadero' }}
+          </button>
+        </div>
+      </form>
+    </article>
+  </div>
+</section>

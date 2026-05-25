@@ -3,6 +3,7 @@ import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { getHttpErrorMessage } from '../../../../core/http/problem-details';
+import { defaultAdminRoute } from '../../../../core/auth/roles';
 import { Auth } from '../../../../core/services/auth';
 
 @Component({
@@ -66,6 +67,10 @@ export class LoginPage {
 
   private getRedirectUrl(): string {
     const redirectUrl = this.route.snapshot.queryParamMap.get('redirectUrl');
-    return redirectUrl?.startsWith('/admin') ? redirectUrl : '/admin/inicio';
+    if (redirectUrl?.startsWith('/admin')) {
+      return redirectUrl;
+    }
+
+    return defaultAdminRoute(this.auth.session()?.role);
   }
 }

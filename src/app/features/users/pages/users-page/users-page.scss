@@ -1,0 +1,35 @@
+.users-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.users-page__grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 992px) {
+  .users-page__grid {
+    grid-template-columns: 1fr 1.1fr;
+  }
+}
+
+.users-card {
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+}
+
+.users-card h2 {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.users-card__actions {
+  margin-top: 1rem;
+}
