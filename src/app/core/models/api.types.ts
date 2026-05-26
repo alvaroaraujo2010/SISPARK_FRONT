@@ -119,6 +119,13 @@ export type ReprintTicketResult = {
   exitTicket?: ExitTicket;
 };
 
+export type ElectronicInvoiceRequest = {
+  documentType: 'CC' | 'NIT' | 'CE' | 'PAS';
+  documentNumber: string;
+  customerName: string;
+  email: string;
+};
+
 export type ParkingMovementResult = {
   success: boolean;
   action: 'entry' | 'exit';
@@ -127,6 +134,8 @@ export type ParkingMovementResult = {
   entryTicket?: EntryTicket;
   exitTicket?: ExitTicket;
   guestRegistrationCreated?: boolean;
+  electronicInvoiceRequested?: boolean;
+  electronicInvoiceMessage?: string;
 };
 
 export type ParkingLot = {

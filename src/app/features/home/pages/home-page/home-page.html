@@ -361,6 +361,68 @@
   </div>
 </section>
 
+@if (exitBillingDialog(); as billing) {
+  <div
+    class="ticket-modal-backdrop"
+    role="presentation"
+    (click)="closeExitBillingDialog()"
+  >
+    <div
+      class="ticket-modal ticket-modal--billing"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="billing-dialog-title"
+      (click)="$event.stopPropagation()"
+    >
+      <h3 id="billing-dialog-title" class="ticket-modal__title">
+        ¿Desea facturación electrónica para {{ billing.plate }}?
+      </h3>
+      <p class="ticket-modal__copy">
+        Total a pagar:
+        <strong>{{ billing.estimatedAmount ?? 0 | currency: 'COP' : 'symbol' : '1.0-0' }}</strong>
+      </p>
+
+      <form [formGroup]="invoiceForm" (ngSubmit)="confirmExitWithBillingChoice()">
+        <div class="form-check mb-2">
+          <input id="wants-invoice" class="form-check-input" type="checkbox" formControlName="wantsElectronicInvoice" />
+          <label class="form-check-label" for="wants-invoice">Sí, solicitar facturación electrónica</label>
+        </div>
+
+        @if (invoiceForm.controls.wantsElectronicInvoice.value) {
+          <div class="row g-2 mb-3">
+            <div class="col-4">
+              <label class="form-label" for="inv-doc-type">Tipo</label>
+              <select id="inv-doc-type" class="form-select" formControlName="documentType">
+                <option value="CC">CC</option>
+                <option value="NIT">NIT</option>
+                <option value="CE">CE</option>
+                <option value="PAS">PAS</option>
+              </select>
+            </div>
+            <div class="col-8">
+              <label class="form-label" for="inv-doc-number">Documento</label>
+              <input id="inv-doc-number" class="form-control" formControlName="documentNumber" maxlength="30" />
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="inv-name">Nombre o razón social</label>
+              <input id="inv-name" class="form-control" formControlName="customerName" maxlength="200" />
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="inv-email">Correo</label>
+              <input id="inv-email" class="form-control" type="email" formControlName="email" maxlength="120" />
+            </div>
+          </div>
+        }
+
+        <div class="ticket-modal__actions">
+          <button class="btn btn-success" type="submit">Confirmar salida</button>
+          <button class="btn btn-outline-dark" type="button" (click)="closeExitBillingDialog()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
 @if (reprintDialog(); as dialog) {
   <div
     class="ticket-modal-backdrop"

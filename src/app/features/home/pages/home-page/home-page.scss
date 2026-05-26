@@ -79,6 +79,16 @@
   min-width: 5.5rem;
 }
 
+.ticket-modal--billing {
+  width: min(100%, 32rem);
+}
+
+.ticket-modal__copy {
+  margin: -0.35rem 0 0.9rem;
+  text-align: center;
+  color: var(--sp-muted);
+}
+
 .command-shell {
   padding: 2rem 0 0.5rem;
 }

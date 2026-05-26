@@ -4,6 +4,7 @@ import { Observable, catchError, map, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import type {
   ActiveVehicle,
+  ElectronicInvoiceRequest,
   ParkingBoardVehicle,
   ParkingMovementPreview,
   ParkingMovementResult,
@@ -61,10 +62,17 @@ export class Parking {
     return this.http.get<ParkingMovementPreview>(`${this.apiUrl}/plates/${encoded}/movement-preview`);
   }
 
-  registerEntryExit(plate: string, vehicleTypeId?: number): Observable<ParkingMovementResult> {
+  registerEntryExit(
+    plate: string,
+    vehicleTypeId?: number,
+    wantsElectronicInvoice = false,
+    electronicInvoice?: ElectronicInvoiceRequest,
+  ): Observable<ParkingMovementResult> {
     return this.http.post<ParkingMovementResult>(`${this.apiUrl}/entry-exit`, {
       plate,
       vehicleTypeId: vehicleTypeId ?? null,
+      wantsElectronicInvoice,
+      electronicInvoice: wantsElectronicInvoice ? electronicInvoice : null,
     });
   }
 

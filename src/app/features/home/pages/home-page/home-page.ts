@@ -9,6 +9,7 @@ import { BoardRefresh } from '../../../../core/services/board-refresh';
 import type {
   ParkingBoardVehicle,
   DashboardSummary,
+  ElectronicInvoiceRequest,
   EntryTicket,
   ExitTicket,
   ParkingMovementPreview,
@@ -37,6 +38,11 @@ type ReprintDialogState = {
   entryTicket?: EntryTicket;
   exitTicket?: ExitTicket;
   errorMessage?: string;
+};
+
+type ExitBillingDialogState = {
+  plate: string;
+  estimatedAmount?: number;
 };
 
 function formatCop(amount: number): string {
@@ -110,8 +116,16 @@ export class HomePage {
   protected readonly movementMessage = signal('');
   protected readonly printPrompt = signal<PrintPrompt | null>(null);
   protected readonly reprintDialog = signal<ReprintDialogState | null>(null);
+  protected readonly exitBillingDialog = signal<ExitBillingDialogState | null>(null);
   protected readonly movementPreview = signal<ParkingMovementPreview | null>(null);
   protected readonly selectedVehicleTypeId = signal<number | null>(null);
+  protected readonly invoiceForm = this.fb.nonNullable.group({
+    wantsElectronicInvoice: [false],
+    documentType: ['CC' as ElectronicInvoiceRequest['documentType'], [Validators.required]],
+    documentNumber: ['', [Validators.required, Validators.maxLength(30)]],
+    customerName: ['', [Validators.required, Validators.maxLength(200)]],
+    email: ['', [Validators.required, Validators.email, Validators.maxLength(120)]],
+  });
   private readonly ticketPrint = viewChild(ParkingTicketPrint);
   private readonly reprintTicketPrint = viewChild<ParkingTicketPrint>('reprintTicketPrint');
 
@@ -220,17 +234,86 @@ export class HomePage {
       return;
     }
 
+    if (preview.hasOpenEntry) {
+      this.openExitBillingDialog(preview);
+      return;
+    }
+
+    this.submitMovement(preview);
+  }
+
+  private openExitBillingDialog(preview: ParkingMovementPreview): void {
+    this.invoiceForm.reset({
+      wantsElectronicInvoice: false,
+      documentType: 'CC',
+      documentNumber: '',
+      customerName: '',
+      email: '',
+    });
+    this.exitBillingDialog.set({
+      plate: preview.plate,
+      estimatedAmount: preview.estimatedAmountToPay,
+    });
+  }
+
+  protected closeExitBillingDialog(): void {
+    this.exitBillingDialog.set(null);
+  }
+
+  protected confirmExitWithBillingChoice(): void {
+    const preview = this.movementPreview();
+    const dialog = this.exitBillingDialog();
+    if (!preview || !dialog || !preview.hasOpenEntry) {
+      return;
+    }
+
+    const wantsInvoice = this.invoiceForm.controls.wantsElectronicInvoice.value;
+    if (wantsInvoice && this.invoiceForm.invalid) {
+      this.invoiceForm.markAllAsTouched();
+      return;
+    }
+
+    const raw = this.invoiceForm.getRawValue();
+    const invoicePayload: ElectronicInvoiceRequest | undefined = wantsInvoice
+      ? {
+          documentType: raw.documentType,
+          documentNumber: raw.documentNumber.trim(),
+          customerName: raw.customerName.trim(),
+          email: raw.email.trim(),
+        }
+      : undefined;
+
+    this.exitBillingDialog.set(null);
+    this.submitMovement(preview, wantsInvoice, invoicePayload);
+  }
+
+  private submitMovement(
+    preview: ParkingMovementPreview,
+    wantsElectronicInvoice = false,
+    electronicInvoice?: ElectronicInvoiceRequest,
+  ): void {
+
     this.isSubmittingMovement.set(true);
     this.movementError.set('');
     this.movementMessage.set('');
     this.printPrompt.set(null);
 
-    this.parking.registerEntryExit(preview.plate, this.selectedVehicleTypeId() ?? undefined).subscribe({
+    this.parking
+      .registerEntryExit(
+        preview.plate,
+        this.selectedVehicleTypeId() ?? undefined,
+        wantsElectronicInvoice,
+        electronicInvoice,
+      )
+      .subscribe({
       next: (response) => {
         this.isSubmittingMovement.set(false);
         let msg = response.message;
         if (response.action === 'exit' && response.totalToPay != null) {
           msg = `${msg} · Total ${formatCop(response.totalToPay)}`;
+        }
+        if (response.electronicInvoiceRequested && response.electronicInvoiceMessage) {
+          msg = `${msg} · ${response.electronicInvoiceMessage}`;
         }
         this.movementMessage.set(msg);
         this.plateForm.reset();
@@ -252,11 +335,12 @@ export class HomePage {
           getHttpErrorMessage(error, 'No fue posible registrar el movimiento del vehiculo.'),
         );
       },
-    });
+      });
   }
 
   protected cancelMovementFlow(): void {
     this.movementPreview.set(null);
+    this.exitBillingDialog.set(null);
     this.selectedVehicleTypeId.set(null);
     this.movementError.set('');
     this.movementMessage.set('');
