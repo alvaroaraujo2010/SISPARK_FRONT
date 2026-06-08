@@ -1,28 +1,179 @@
 <section class="reports-page">
   <div class="container-shell">
-    <header class="reports-page__header">
-      <div>
-        <span class="section-kicker">Supervisión</span>
-        <h1>Reportes mensuales</h1>
-        <p>
-          Módulo reservado para el perfil <strong>Supervisor</strong>. Aquí se publicará el reporte
-          mensual consolidado (mensualidades, ingresos y ocupación).
-        </p>
-      </div>
-      <div class="session-oval session-oval--compact">
-        <span class="session-oval__label">Sesión</span>
-        <strong class="session-oval__name">{{ session()?.fullName }}</strong>
-        <span class="session-oval__role">{{ roleLabel(session()?.role) }}</span>
-      </div>
-    </header>
+    <app-page-header
+      kicker="Supervision"
+      title="Reportes e indicadores"
+      description="Visualice el desempeno del parqueadero: ingresos, ocupacion, operadores y contratos por vencer."
+      [sessionName]="session()?.fullName ?? null"
+      [sessionRole]="session()?.role ?? null"
+    />
 
-    <article class="reports-placeholder">
-      <i class="bi bi-bar-chart-line" aria-hidden="true"></i>
-      <h2>Próximamente</h2>
-      <p>
-        Mientras tanto puede consultar mensualidades por vencer desde el asistente de canal
-        (comando <em>mensualidades</em>) si tiene permisos de supervisión.
-      </p>
+    @if (loadError()) {
+      <div class="status-banner status-banner--danger" role="alert">{{ loadError() }}</div>
+    }
+
+    <div class="reports-page__toolbar">
+      <div>
+        <label class="form-label" for="reports-from">Desde</label>
+        <input
+          id="reports-from"
+          class="form-control"
+          type="date"
+          [value]="from()"
+          (change)="setFrom($any($event.target).value)"
+        />
+      </div>
+      <div>
+        <label class="form-label" for="reports-to">Hasta</label>
+        <input
+          id="reports-to"
+          class="form-control"
+          type="date"
+          [value]="to()"
+          (change)="setTo($any($event.target).value)"
+        />
+      </div>
+    </div>
+
+    <div class="reports-page__kpis">
+      <app-kpi-card
+        label="Cobros por registros"
+        [value]="incomeResource.value().ingresosCobros | currency: 'COP' : 'symbol' : '1.0-0' : 'es-CO'"
+        hint="Vehiculos que salieron en el periodo"
+        icon="bi-cash-stack"
+        tone="green"
+      />
+      <app-kpi-card
+        label="Pagos registrados"
+        [value]="incomeResource.value().ingresosPagos | currency: 'COP' : 'symbol' : '1.0-0' : 'es-CO'"
+        hint="Caja, tarjetas, transferencias, QR"
+        icon="bi-receipt-cutoff"
+        tone="blue"
+      />
+      <app-kpi-card
+        label="Mensualidades iniciadas"
+        [value]="incomeResource.value().ingresosMensualidades | currency: 'COP' : 'symbol' : '1.0-0' : 'es-CO'"
+        hint="Contratos nuevos del periodo"
+        icon="bi-calendar2-heart"
+        tone="gold"
+      />
+      <app-kpi-card
+        label="Ocupacion promedio"
+        [value]="((occupancyResource.value().ocupacionPromedio * 100) | number: '1.0-1') + '%'"
+        hint="Capacidad maxima: {{ occupancyResource.value().capacidadTotal }} cupos"
+        icon="bi-grid-3x3-gap"
+        tone="neutral"
+      />
+    </div>
+
+    <div class="reports-page__grid">
+      <article class="reports-card">
+        <h2>Ingresos diarios</h2>
+        @if (incomeResource.value().serie.length === 0) {
+          <app-empty-state
+            icon="bi-graph-up"
+            title="Sin datos en el periodo"
+            description="Amplia el rango de fechas para ver resultados."
+          />
+        } @else {
+          <div class="table-responsive">
+            <table class="table table-sm align-middle">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Cantidad</th>
+                  <th class="text-end">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of incomeResource.value().serie; track row.fecha) {
+                  <tr>
+                    <td>{{ row.fecha | date: 'mediumDate' }}</td>
+                    <td>{{ row.cantidad }}</td>
+                    <td class="text-end">
+                      {{ row.total | currency: 'COP' : 'symbol' : '1.0-0' : 'es-CO' }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </article>
+
+      <article class="reports-card">
+        <h2>Operadores</h2>
+        @if (operatorsResource.value().operadores.length === 0) {
+          <app-empty-state
+            icon="bi-person-badge"
+            title="Sin movimientos en el periodo"
+            description="Pruebe ampliando el rango de fechas."
+          />
+        } @else {
+          <div class="table-responsive">
+            <table class="table table-sm align-middle">
+              <thead>
+                <tr>
+                  <th>Operador</th>
+                  <th>Entradas</th>
+                  <th>Salidas</th>
+                  <th>Pagos</th>
+                  <th class="text-end">Ingresos</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of operatorsResource.value().operadores; track row.idUsuario) {
+                  <tr>
+                    <td>{{ row.nombre }}</td>
+                    <td>{{ row.entradas }}</td>
+                    <td>{{ row.salidas }}</td>
+                    <td>{{ row.pagosRegistrados }}</td>
+                    <td class="text-end">
+                      {{ row.ingresos | currency: 'COP' : 'symbol' : '1.0-0' : 'es-CO' }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </article>
+    </div>
+
+    <article class="reports-card reports-card--wide">
+      <h2>Mensualidades por vencer (proximos 14 dias)</h2>
+      @if (monthliesDueResource.value().items.length === 0) {
+        <app-empty-state
+          icon="bi-calendar2-week"
+          title="No hay mensualidades proximas a vencer"
+          description="Las nuevas se mostraran automaticamente aqui."
+        />
+      } @else {
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Placa</th>
+                <th>Vence</th>
+                <th class="text-end">Valor</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of monthliesDueResource.value().items; track item.idMensualidad) {
+                <tr>
+                  <td>{{ item.cliente }}</td>
+                  <td><code>{{ item.placa }}</code></td>
+                  <td>{{ item.fechaFin | date: 'mediumDate' }}</td>
+                  <td class="text-end">
+                    {{ item.valor | currency: 'COP' : 'symbol' : '1.0-0' : 'es-CO' }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
     </article>
   </div>
 </section>

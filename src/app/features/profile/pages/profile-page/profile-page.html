@@ -1,0 +1,92 @@
+<section class="profile-page">
+  <div class="container-shell">
+    <app-page-header
+      kicker="Cuenta"
+      title="Mi perfil"
+      description="Consulta tu informacion de sesion y cambia la contraseña."
+      [sessionName]="session()?.fullName ?? null"
+      [sessionRole]="session()?.role ?? null"
+    />
+
+    <div class="profile-page__grid">
+      <article class="profile-card">
+        <h2>Datos de la cuenta</h2>
+        <dl class="profile-card__list">
+          <div>
+            <dt>Nombre</dt>
+            <dd>{{ session()?.fullName }}</dd>
+          </div>
+          <div>
+            <dt>Usuario</dt>
+            <dd><code>{{ session()?.username }}</code></dd>
+          </div>
+          <div>
+            <dt>Rol</dt>
+            <dd>{{ session()?.role }}</dd>
+          </div>
+          <div>
+            <dt>Sesion vence</dt>
+            <dd>{{ session()?.expiresAt | date: 'short' }}</dd>
+          </div>
+        </dl>
+      </article>
+
+      <article class="profile-card">
+        <h2>Cambiar contraseña</h2>
+        <form [formGroup]="passwordForm" (ngSubmit)="submit()">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label" for="current-password">Contraseña actual</label>
+              <input
+                id="current-password"
+                class="form-control"
+                type="password"
+                formControlName="currentPassword"
+                autocomplete="current-password"
+              />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="new-password">Nueva contraseña</label>
+              <input
+                id="new-password"
+                class="form-control"
+                type="password"
+                formControlName="newPassword"
+                minlength="6"
+                autocomplete="new-password"
+              />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="confirm-password">Confirmar nueva</label>
+              <input
+                id="confirm-password"
+                class="form-control"
+                type="password"
+                formControlName="confirmPassword"
+                minlength="6"
+                autocomplete="new-password"
+              />
+            </div>
+          </div>
+
+          @if (error()) {
+            <div class="status-banner status-banner--danger mt-3" role="alert">{{ error() }}</div>
+          }
+          @if (feedback()) {
+            <div class="status-banner status-banner--success mt-3" role="alert">{{ feedback() }}</div>
+          }
+
+          <div class="profile-card__actions">
+            <button
+              class="btn btn-success"
+              type="submit"
+              [disabled]="saving() || passwordForm.invalid"
+            >
+              {{ saving() ? 'Guardando...' : 'Actualizar contraseña' }}
+            </button>
+          </div>
+        </form>
+      </article>
+    </div>
+  </div>
+</section>

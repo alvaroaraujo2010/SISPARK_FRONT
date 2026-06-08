@@ -24,6 +24,10 @@ export function isAdministrator(role: string | undefined | null): boolean {
   return role === SystemRoles.administrador;
 }
 
+export function isCashier(role: string | undefined | null): boolean {
+  return role === SystemRoles.cajero;
+}
+
 export function canOperateParking(role: string | undefined | null): boolean {
   return (
     role === SystemRoles.administrador ||

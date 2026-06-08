@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import type { LoginResponse } from '../models/api.types';
+import type { ChangePasswordPayload, LoginResponse } from '../models/api.types';
 
 export type SessionData = LoginResponse & {
   userId: number | null;
@@ -41,6 +41,10 @@ export class Auth {
         this.persistSession(sessionData);
       }),
     );
+  }
+
+  changePassword(payload: ChangePasswordPayload) {
+    return this.http.post<void>(`${this.apiUrl}/change-password`, payload);
   }
 
   logout(): void {

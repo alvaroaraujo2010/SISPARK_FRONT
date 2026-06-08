@@ -1,6 +1,54 @@
-<div class="public-layout">
-  <main class="public-layout__content">
-    <router-outlet></router-outlet>
-  </main>
-  <app-footer></app-footer>
-</div>
+<header class="public-header" role="banner">
+  <div class="container-shell public-header__inner">
+    <a class="public-brand" routerLink="/">
+      <span class="logo-tile logo-tile--public" aria-hidden="true">
+        <img src="images/logo_moderno_de_sispark.png" alt="SisPark" decoding="async" />
+      </span>
+      <span class="public-brand__text">SISPARK</span>
+    </a>
+
+    <nav class="public-nav" aria-label="Navegación principal">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Inicio</a>
+      <a routerLink="/login" class="public-nav__cta btn btn-success">Acceder al panel</a>
+    </nav>
+
+    <button class="public-nav__toggle" type="button" (click)="toggleMobileNav()" [attr.aria-expanded]="mobileNavOpen()" aria-label="Abrir menú">
+      <i class="bi" [class.bi-list]="!mobileNavOpen()" [class.bi-x-lg]="mobileNavOpen()" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  @if (mobileNavOpen()) {
+    <div class="public-nav__mobile" role="navigation" aria-label="Menú móvil">
+      <a routerLink="/" (click)="closeMobileNav()">Inicio</a>
+      <a routerLink="/login" class="public-nav__cta btn btn-success" (click)="closeMobileNav()">Acceder al panel</a>
+    </div>
+  }
+</header>
+
+<main class="public-layout__content">
+  <router-outlet></router-outlet>
+</main>
+
+<footer class="public-footer" role="contentinfo">
+  <div class="container-shell public-footer__grid">
+    <div class="public-footer__brand">
+      <span class="logo-tile logo-tile--footer" aria-hidden="true">
+        <img src="images/logo_moderno_de_sispark.png" alt="SisPark" decoding="async" />
+      </span>
+      <div>
+        <strong>SISPARK</strong>
+        <p>Sistema integral de gestión para parqueaderos.</p>
+      </div>
+    </div>
+
+    <nav class="public-footer__nav" aria-label="Enlaces de pie de página">
+      <a routerLink="/">Inicio</a>
+      <a routerLink="/login">Acceso administrativo</a>
+    </nav>
+
+    <div class="public-footer__legal">
+      <p>&copy; {{ currentYear() }} SISPARK. Todos los derechos reservados.</p>
+      <p class="public-footer__note">Plataforma de gestión para parqueaderos.</p>
+    </div>
+  </div>
+</footer>

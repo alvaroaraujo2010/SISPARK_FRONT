@@ -239,3 +239,249 @@ export type CreateWhatsAppLinkPayload = {
   waId: string;
   userId: number;
 };
+
+export type ClientSummary = {
+  id: number;
+  tipoDocumento: string;
+  numeroDocumento: string;
+  nombreCompleto: string;
+  correo: string;
+  telefono: string;
+  direccion: string;
+  idEstado: number;
+  isActive: boolean;
+  fechaCreacion: string;
+  placaPrincipal: string;
+};
+
+export type UpdateClientPayload = {
+  fullName: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  isActive: boolean;
+};
+
+export type Rate = {
+  id: number;
+  nombre: string;
+  idTipoServicio: number;
+  servicio: string;
+  idTipoVehiculo: number;
+  tipoVehiculo: string;
+  valor: number;
+  fraccionMinutos: number | null;
+  fechaInicioVigencia: string;
+  fechaFinVigencia: string | null;
+  isActive: boolean;
+};
+
+export type CreateRatePayload = {
+  name: string;
+  serviceTypeId: number;
+  vehicleTypeId: number;
+  value: number;
+  fractionMinutes?: number;
+  startDate?: string;
+  makeActive: boolean;
+};
+
+export type UpdateRatePayload = {
+  name: string;
+  serviceTypeId: number;
+  vehicleTypeId: number;
+  value: number;
+  fractionMinutes?: number;
+  endDate?: string;
+  isActive: boolean;
+};
+
+export type MonthlyStatus = 'Vigente' | 'Vencida' | 'Todas';
+
+export type Monthly = {
+  id: number;
+  idCliente: number;
+  cliente: string;
+  idVehiculo: number;
+  placa: string;
+  tipoVehiculo: string;
+  idTarifa: number;
+  tarifa: string;
+  fechaInicio: string;
+  fechaFin: string;
+  valor: number;
+  idEstado: number;
+  estadoNombre: string;
+  observaciones: string;
+};
+
+export type MonthlyHistoryEntry = {
+  id: number;
+  fechaInicio: string;
+  fechaFin: string;
+  valor: number;
+  idEstado: number;
+  observaciones: string;
+};
+
+export type CreateMonthlyPayload = {
+  clientId: number;
+  vehicleId: number;
+  rateId: number;
+  cellId?: number;
+  startDate: string;
+  endDate: string;
+  value: number;
+  notes?: string;
+};
+
+export type RenewMonthlyPayload = {
+  newEndDate: string;
+  newValue: number;
+  notes?: string;
+};
+
+export type PaymentMethod = {
+  id: number;
+  nombre: string;
+  descripcion: string;
+};
+
+export type Payment = {
+  id: number;
+  fechaPago: string;
+  idRegistro: number | null;
+  idMensualidad: number | null;
+  idMetodoPago: number;
+  metodoPago: string;
+  idUsuario: number;
+  operador: string;
+  valorPagado: number;
+  referencia: string;
+  observacion: string;
+};
+
+export type CreatePaymentPayload = {
+  registrationId?: number;
+  monthlyId?: number;
+  methodId: number;
+  value: number;
+  reference?: string;
+  note?: string;
+};
+
+export type CashByMethod = {
+  idMetodoPago: number;
+  metodo: string;
+  total: number;
+  cantidad: number;
+};
+
+export type CashByOperator = {
+  idUsuario: number;
+  operador: string;
+  total: number;
+  cantidad: number;
+};
+
+export type CashCloseout = {
+  fecha: string;
+  cantidadPagos: number;
+  totalRecaudado: number;
+  ingresosRegistros: number;
+  porMetodo: CashByMethod[];
+  porOperador: CashByOperator[];
+};
+
+export type IncomeReport = {
+  from: string;
+  to: string;
+  ingresosCobros: number;
+  ingresosPagos: number;
+  ingresosMensualidades: number;
+  serie: { fecha: string; total: number; cantidad: number }[];
+};
+
+export type OccupancyReport = {
+  from: string;
+  to: string;
+  capacidadTotal: number;
+  ocupacionPromedio: number;
+  totalEntradas: number;
+  totalSalidas: number;
+  serie: {
+    fecha: string;
+    entradas: number;
+    salidas: number;
+    capacidadTotal: number;
+  }[];
+};
+
+export type OperatorPerformanceRow = {
+  idUsuario: number;
+  nombre: string;
+  entradas: number;
+  salidas: number;
+  ingresos: number;
+  pagosRegistrados: number;
+};
+
+export type OperatorPerformanceReport = {
+  from: string;
+  to: string;
+  operadores: OperatorPerformanceRow[];
+};
+
+export type DueSoonItem = {
+  idMensualidad: number;
+  cliente: string;
+  placa: string;
+  fechaFin: string;
+  valor: number;
+};
+
+export type DueSoonReport = {
+  from: string;
+  to: string;
+  items: DueSoonItem[];
+};
+
+export type AuditEntry = {
+  id: number;
+  fecha: string;
+  idUsuario: number | null;
+  nombreUsuario: string;
+  modulo: string;
+  accion: string;
+  entidad: string;
+  entidadId: string;
+  detalle: string;
+  direccionIp: string;
+};
+
+export type UserProfile = {
+  id: number;
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  role: string;
+  createdAt: string;
+  lastAccess: string | null;
+};
+
+export type ChangePasswordPayload = {
+  currentPassword: string;
+  newPassword: string;
+};
+
+export type UpdateUserPayload = {
+  firstName: string;
+  lastName: string;
+  email?: string;
+  roleId: number;
+};
+
+export type ResetPasswordPayload = {
+  newPassword: string;
+};

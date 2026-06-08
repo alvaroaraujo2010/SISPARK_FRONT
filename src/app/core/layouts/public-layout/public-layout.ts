@@ -1,11 +1,21 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { Footer } from '../../../shared/components/footer/footer';
+import { Component, computed, inject, signal } from '@angular/core';
+import { RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-public-layout',
-  imports: [RouterOutlet, Footer],
+  imports: [RouterLink, RouterLinkActive, RouterModule],
   templateUrl: './public-layout.html',
   styleUrl: './public-layout.scss',
 })
-export class PublicLayout {}
+export class PublicLayout {
+  protected readonly mobileNavOpen = signal(false);
+  protected readonly currentYear = computed(() => new Date().getFullYear());
+
+  protected toggleMobileNav(): void {
+    this.mobileNavOpen.update((open) => !open);
+  }
+
+  protected closeMobileNav(): void {
+    this.mobileNavOpen.set(false);
+  }
+}

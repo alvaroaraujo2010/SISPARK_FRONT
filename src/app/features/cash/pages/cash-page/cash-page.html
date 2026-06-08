@@ -1,0 +1,260 @@
+<section class="cash-page">
+  <div class="container-shell">
+    <app-page-header
+      kicker="Caja"
+      title="Pagos y cierre diario"
+      description="Registre pagos asociados a registros de parqueo o mensualidades, y consulte el cierre de caja por dia."
+      [sessionName]="session()?.fullName ?? null"
+      [sessionRole]="session()?.role ?? null"
+    />
+
+    @if (loadError()) {
+      <div class="status-banner status-banner--danger" role="alert">{{ loadError() }}</div>
+    }
+
+    <div class="cash-page__kpis">
+      <app-kpi-card
+        label="Recaudado hoy"
+        [value]="totalRecaudado() | currency: 'COP' : 'symbol' : '1.0-0' : 'es-CO'"
+        [hint]="totalCantidad() + ' pagos registrados'"
+        icon="bi-cash-coin"
+        tone="green"
+      />
+      <app-kpi-card
+        label="Cobros en registros"
+        [value]="totalIngresos() | currency: 'COP' : 'symbol' : '1.0-0' : 'es-CO'"
+        hint="Vehiculos que salieron"
+        icon="bi-car-front"
+        tone="blue"
+      />
+      <app-kpi-card
+        label="Fecha del cierre"
+        [value]="selectedDate()"
+        hint="Seleccione otra fecha para consultar"
+        icon="bi-calendar3"
+        tone="neutral"
+      />
+    </div>
+
+    <div class="cash-page__toolbar">
+      <div>
+        <label class="form-label" for="cash-date">Fecha del cierre</label>
+        <input
+          id="cash-date"
+          class="form-control"
+          type="date"
+          [value]="selectedDate()"
+          (change)="setDate($any($event.target).value)"
+        />
+      </div>
+    </div>
+
+    <div class="cash-page__grid">
+      <article class="cash-card">
+        <h2>Cierre del dia</h2>
+        @if (closeoutResource.isLoading()) {
+          <p class="text-muted">Calculando cierre...</p>
+        } @else {
+          <div class="cash-card__row">
+            <h3>Por metodo de pago</h3>
+            @if (closeoutResource.value().porMetodo.length === 0) {
+              <p class="text-muted">Sin pagos registrados.</p>
+            } @else {
+              <ul class="cash-card__list">
+                @for (row of closeoutResource.value().porMetodo; track row.idMetodoPago) {
+                  <li>
+                    <span>{{ row.metodo }}</span>
+                    <strong>{{ row.total | currency: 'COP' : 'symbol' : '1.0-0' : 'es-CO' }}</strong>
+                    <small>{{ row.cantidad }} pagos</small>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+          <div class="cash-card__row">
+            <h3>Por operador</h3>
+            @if (closeoutResource.value().porOperador.length === 0) {
+              <p class="text-muted">Sin pagos registrados.</p>
+            } @else {
+              <ul class="cash-card__list">
+                @for (row of closeoutResource.value().porOperador; track row.idUsuario) {
+                  <li>
+                    <span>{{ row.operador }}</span>
+                    <strong>{{ row.total | currency: 'COP' : 'symbol' : '1.0-0' : 'es-CO' }}</strong>
+                    <small>{{ row.cantidad }} pagos</small>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+        }
+      </article>
+
+      <article class="cash-card">
+        <h2>Registrar pago</h2>
+        <p class="text-muted">
+          Asocia el pago a un registro de parqueo o a una mensualidad. Los pagos manuales
+          quedan asentados en la bitacora del sistema.
+        </p>
+        <form [formGroup]="paymentForm" (ngSubmit)="submit()">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" for="payment-method">Metodo de pago</label>
+              <select id="payment-method" class="form-select" formControlName="methodId">
+                <option [ngValue]="0" disabled>Seleccione...</option>
+                @for (method of methodsResource.value(); track method.id) {
+                  <option [ngValue]="method.id">{{ method.nombre }}</option>
+                }
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="payment-value">Valor (COP)</label>
+              <input
+                id="payment-value"
+                class="form-control"
+                type="number"
+                min="0"
+                step="100"
+                formControlName="value"
+              />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="payment-registration">Id registro</label>
+              <input
+                id="payment-registration"
+                class="form-control"
+                type="number"
+                min="0"
+                formControlName="registrationId"
+              />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="payment-monthly">Id mensualidad</label>
+              <input
+                id="payment-monthly"
+                class="form-control"
+                type="number"
+                min="0"
+                formControlName="monthlyId"
+              />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="payment-ref">Referencia (opcional)</label>
+              <input
+                id="payment-ref"
+                class="form-control"
+                formControlName="reference"
+                maxlength="80"
+              />
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="payment-note">Nota</label>
+              <textarea
+                id="payment-note"
+                class="form-control"
+                rows="2"
+                formControlName="note"
+                maxlength="255"
+              ></textarea>
+            </div>
+          </div>
+
+          @if (error()) {
+            <div class="status-banner status-banner--danger mt-3" role="alert">{{ error() }}</div>
+          }
+          @if (feedback()) {
+            <div class="status-banner status-banner--success mt-3" role="alert">{{ feedback() }}</div>
+          }
+
+          <div class="cash-card__actions">
+            <button
+              class="btn btn-success"
+              type="submit"
+              [disabled]="saving() || paymentForm.invalid"
+            >
+              {{ saving() ? 'Registrando...' : 'Registrar pago' }}
+            </button>
+          </div>
+        </form>
+      </article>
+    </div>
+
+    <article class="cash-card cash-card--wide">
+      <header class="cash-card__header">
+        <h2>Historial de pagos</h2>
+        <div class="cash-card__range">
+          <div>
+            <label class="form-label" for="cash-from">Desde</label>
+            <input
+              id="cash-from"
+              class="form-control"
+              type="date"
+              [value]="searchFrom()"
+              (change)="setFrom($any($event.target).value)"
+            />
+          </div>
+          <div>
+            <label class="form-label" for="cash-to">Hasta</label>
+            <input
+              id="cash-to"
+              class="form-control"
+              type="date"
+              [value]="searchTo()"
+              (change)="setTo($any($event.target).value)"
+            />
+          </div>
+        </div>
+      </header>
+      @if (paymentsResource.isLoading()) {
+        <p class="text-muted">Cargando pagos...</p>
+      } @else if (paymentsResource.value().length === 0) {
+        <app-empty-state
+          icon="bi-receipt"
+          title="Sin pagos en el rango seleccionado"
+          description="Ajusta las fechas o registra un nuevo pago."
+        />
+      } @else {
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Operador</th>
+                <th>Metodo</th>
+                <th>Origen</th>
+                <th>Valor</th>
+                <th>Referencia</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (payment of paymentsResource.value(); track payment.id) {
+                <tr>
+                  <td>{{ payment.fechaPago | date: 'short' }}</td>
+                  <td>{{ payment.operador }}</td>
+                  <td>{{ payment.metodoPago }}</td>
+                  <td>
+                    @if (payment.idRegistro) {
+                      <span class="badge text-bg-light">Registro #{{ payment.idRegistro }}</span>
+                    } @else if (payment.idMensualidad) {
+                      <span class="badge text-bg-light">Mensualidad #{{ payment.idMensualidad }}</span>
+                    } @else {
+                      <span class="text-muted">N/A</span>
+                    }
+                  </td>
+                  <td>{{ payment.valorPagado | currency: 'COP' : 'symbol' : '1.0-0' : 'es-CO' }}</td>
+                  <td>
+                    @if (payment.referencia) {
+                      <code>{{ payment.referencia }}</code>
+                    } @else {
+                      <span class="text-muted">—</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </article>
+  </div>
+</section>

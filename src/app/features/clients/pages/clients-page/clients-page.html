@@ -1,0 +1,194 @@
+<section class="clients-page">
+  <div class="container-shell">
+    <app-page-header
+      kicker="Operacion"
+      title="Clientes registrados"
+      description="Consulte, edite o desactive clientes. Use la busqueda por nombre, documento o placa."
+      [sessionName]="session()?.fullName ?? null"
+      [sessionRole]="session()?.role ?? null"
+    />
+
+    @if (loadError()) {
+      <div class="status-banner status-banner--danger" role="alert">{{ loadError() }}</div>
+    }
+
+    <div class="clients-page__toolbar">
+      <div class="clients-page__filters">
+        <label class="form-label" for="client-search">Buscar</label>
+        <input
+          id="client-search"
+          class="form-control"
+          type="search"
+          placeholder="Nombre, documento o placa"
+          [value]="searchTerm()"
+          (input)="onSearchChange($any($event.target).value)"
+        />
+      </div>
+      <label class="form-check form-switch clients-page__switch">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          role="switch"
+          [checked]="includeInactive()"
+          (change)="toggleInactive($any($event.target).checked)"
+        />
+        <span class="form-check-label">Mostrar inactivos</span>
+      </label>
+    </div>
+
+    <div class="clients-page__grid">
+      <article class="clients-card">
+        <h2>Listado</h2>
+        @if (clientsResource.isLoading()) {
+          <p class="text-muted">Cargando clientes...</p>
+        } @else if (clientsResource.value().length === 0) {
+          <app-empty-state
+            icon="bi-people"
+            title="Aun no hay clientes"
+            description="Cree clientes desde el modulo de registro de vehiculos."
+          />
+        } @else {
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Documento</th>
+                  <th>Placa</th>
+                  <th>Estado</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (client of clientsResource.value(); track client.id) {
+                  <tr
+                    [class.is-selected]="selectedId() === client.id"
+                    (click)="selectClient(client.id)"
+                  >
+                    <td>
+                      <div class="clients-card__name">{{ client.nombreCompleto }}</div>
+                      <small class="text-muted">{{ client.correo || client.telefono || 'Sin contacto' }}</small>
+                    </td>
+                    <td>
+                      <span class="badge text-bg-light text-uppercase">{{ client.tipoDocumento }}</span>
+                      <code class="ms-2">{{ client.numeroDocumento }}</code>
+                    </td>
+                    <td>
+                      @if (client.placaPrincipal) {
+                        <code>{{ client.placaPrincipal }}</code>
+                      } @else {
+                        <span class="text-muted">Sin vehiculo</span>
+                      }
+                    </td>
+                    <td>
+                      @if (client.isActive) {
+                        <span class="badge text-bg-success">Activo</span>
+                      } @else {
+                        <span class="badge text-bg-secondary">Inactivo</span>
+                      }
+                    </td>
+                    <td class="text-end">
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-success"
+                        (click)="selectClient(client.id); $event.stopPropagation()"
+                      >
+                        Editar
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </article>
+
+      <article class="clients-card">
+        @if (selectedClient(); as client) {
+          <h2>Editar cliente</h2>
+          <p class="text-muted">Actualice los datos de contacto o desactive el cliente.</p>
+          <form [formGroup]="editForm" (ngSubmit)="save()">
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label" for="client-name">Nombre completo</label>
+                <input
+                  id="client-name"
+                  class="form-control"
+                  formControlName="fullName"
+                  maxlength="150"
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="client-phone">Telefono</label>
+                <input
+                  id="client-phone"
+                  class="form-control"
+                  formControlName="phone"
+                  maxlength="30"
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="client-email">Correo</label>
+                <input
+                  id="client-email"
+                  class="form-control"
+                  type="email"
+                  formControlName="email"
+                  maxlength="120"
+                />
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="client-address">Direccion</label>
+                <input
+                  id="client-address"
+                  class="form-control"
+                  formControlName="address"
+                  maxlength="180"
+                />
+              </div>
+              <div class="col-12">
+                <label class="form-check form-switch">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    formControlName="isActive"
+                  />
+                  <span class="form-check-label">Cliente activo</span>
+                </label>
+              </div>
+            </div>
+
+            @if (error()) {
+              <div class="status-banner status-banner--danger mt-3" role="alert">{{ error() }}</div>
+            }
+            @if (feedback()) {
+              <div class="status-banner status-banner--success mt-3" role="alert">{{ feedback() }}</div>
+            }
+
+            <div class="clients-card__actions">
+              <button class="btn btn-outline-secondary" type="button" (click)="clearSelection()">
+                Cancelar
+              </button>
+              <button
+                class="btn btn-success"
+                type="submit"
+                [disabled]="saving() || editForm.invalid"
+              >
+                {{ saving() ? 'Guardando...' : 'Guardar cambios' }}
+              </button>
+            </div>
+          </form>
+        } @else {
+          <h2>Detalle del cliente</h2>
+          <app-empty-state
+            icon="bi-person-vcard"
+            title="Selecciona un cliente"
+            description="Use el listado para editar o desactivar clientes."
+          />
+        }
+      </article>
+    </div>
+  </div>
+</section>

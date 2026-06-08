@@ -1,0 +1,37 @@
+.empty-state {
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  border-radius: 22px;
+  border: 1px dashed rgba(15, 23, 42, 0.18);
+  background: rgba(255, 255, 255, 0.75);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.empty-state__icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--sp-green-soft);
+  color: var(--sp-green-deep);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  margin-bottom: 0.3rem;
+}
+
+.empty-state__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--sp-ink);
+}
+
+.empty-state__description {
+  color: var(--sp-muted);
+  margin: 0;
+  max-width: 420px;
+}

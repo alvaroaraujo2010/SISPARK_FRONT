@@ -6,4 +6,11 @@
 
 .admin-layout__content {
   flex: 1;
+  padding: 1.75rem 0 2.5rem;
+}
+
+@media (max-width: 768px) {
+  .admin-layout__content {
+    padding: 1rem 0 2rem;
+  }
 }

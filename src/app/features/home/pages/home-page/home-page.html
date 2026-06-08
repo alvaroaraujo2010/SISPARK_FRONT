@@ -1,24 +1,3 @@
-<section class="command-shell">
-  <div class="container-shell">
-    <div class="command-top">
-      <div class="command-top__intro">
-        <span class="command-header__eyebrow">Centro de control</span>
-        <h1>Operación administrativa en tiempo real.</h1>
-        <p>
-          Supervisa la ocupación, registra movimientos y mantén la trazabilidad de cada acción
-          operativa desde una sola vista.
-        </p>
-      </div>
-
-      <div class="session-oval" aria-label="Sesión activa">
-        <span class="session-oval__label">Sesión activa</span>
-        <strong class="session-oval__name">{{ session()?.fullName }}</strong>
-        <span class="session-oval__role">{{ roleLabel(session()?.role) }}</span>
-      </div>
-    </div>
-  </div>
-</section>
-
 <section class="plate-section">
   <div class="container-shell">
     <article class="operation-card operation-card--plate">
@@ -27,7 +6,11 @@
           <span class="section-kicker">Acción rápida</span>
           <h2>Ingreso y salida por placa</h2>
         </div>
-        <i class="bi bi-upc-scan" aria-hidden="true"></i>
+        <div class="plate-header__session" aria-label="Sesión activa">
+          <span class="session-oval__label">Sesion activa</span>
+          <strong class="session-oval__name">{{ session()?.fullName }}</strong>
+          <span class="session-oval__role">{{ roleLabel(session()?.role) }}</span>
+        </div>
       </div>
 
       <p class="operation-card__copy">
@@ -143,54 +126,6 @@
         </div>
       </form>
     </article>
-  </div>
-</section>
-
-<section class="summary-section">
-  <div class="container-shell">
-    <div class="section-heading">
-      <h2>Resumen del día</h2>
-      <p>Indicadores clave para reaccionar rápido en la operación.</p>
-    </div>
-
-    @if (summaryError()) {
-      <div class="status-banner status-banner--danger mb-3" role="alert">
-        <i class="bi bi-exclamation-triangle-fill"></i>
-        <span>{{ summaryError() }}</span>
-      </div>
-    }
-
-    <div class="summary-grid">
-      <article class="summary-card">
-        <i class="bi bi-car-front-fill"></i>
-        <span>Vehículos activos</span>
-        <strong>{{ dashboardResource.isLoading() ? '...' : (dashboardResource.value()?.activeVehicles ?? 0) }}</strong>
-      </article>
-
-      <article class="summary-card">
-        <i class="bi bi-grid-1x2-fill"></i>
-        <span>Cupos disponibles</span>
-        <strong>{{ dashboardResource.isLoading() ? '...' : (dashboardResource.value()?.availableSpots ?? 0) }}</strong>
-      </article>
-
-      <article class="summary-card">
-        <i class="bi bi-cash-stack"></i>
-        <span>Ingresos del día</span>
-        <strong>
-          {{
-            dashboardResource.isLoading()
-              ? '...'
-              : ((dashboardResource.value()?.dailyRevenue ?? 0) | currency: 'COP' : 'symbol' : '1.0-0')
-          }}
-        </strong>
-      </article>
-
-      <article class="summary-card">
-        <i class="bi bi-calendar2-week-fill"></i>
-        <span>Mensualidades por vencer</span>
-        <strong>{{ dashboardResource.isLoading() ? '...' : (dashboardResource.value()?.monthlyDueSoon ?? 0) }}</strong>
-      </article>
-    </div>
   </div>
 </section>
 
@@ -311,6 +246,61 @@
           }
         </tbody>
       </table>
+    </div>
+  </div>
+</section>
+
+<section class="summary-section">
+  <div class="container-shell">
+    <div class="section-heading">
+      <span class="section-kicker">Centro de control</span>
+      <h2>Operación administrativa en tiempo real.</h2>
+      <p>Supervisa la ocupación, registra movimientos y mantén la trazabilidad de cada acción operativa desde una sola vista.</p>
+    </div>
+
+    @if (summaryError()) {
+      <div class="status-banner status-banner--danger mb-3" role="alert">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span>{{ summaryError() }}</span>
+      </div>
+    }
+
+    <div class="summary-grid">
+      <app-kpi-card
+        label="Vehiculos activos"
+        [value]="dashboardResource.isLoading() ? '...' : (dashboardResource.value()?.activeVehicles ?? 0)"
+        hint="Dentro del parqueadero ahora"
+        icon="bi-car-front-fill"
+        tone="green"
+      />
+
+      <app-kpi-card
+        label="Cupos disponibles"
+        [value]="dashboardResource.isLoading() ? '...' : (dashboardResource.value()?.availableSpots ?? 0)"
+        hint="Capacidad restante"
+        icon="bi-grid-1x2-fill"
+        tone="blue"
+      />
+
+      <app-kpi-card
+        label="Ingresos del dia"
+        [value]="
+          dashboardResource.isLoading()
+            ? '...'
+            : ((dashboardResource.value()?.dailyRevenue ?? 0) | currency: 'COP' : 'symbol' : '1.0-0')
+        "
+        hint="Cobros por salidas del dia"
+        icon="bi-cash-stack"
+        tone="gold"
+      />
+
+      <app-kpi-card
+        label="Mensualidades por vencer"
+        [value]="dashboardResource.isLoading() ? '...' : (dashboardResource.value()?.monthlyDueSoon ?? 0)"
+        hint="En los proximos 7 dias"
+        icon="bi-calendar2-week-fill"
+        tone="red"
+      />
     </div>
   </div>
 </section>

@@ -1,0 +1,10 @@
+<article class="kpi-card" [attr.data-tone]="tone()">
+  <span class="kpi-card__icon"><i class="bi {{ icon() }}" aria-hidden="true"></i></span>
+  <div class="kpi-card__body">
+    <span class="kpi-card__label">{{ label() }}</span>
+    <strong class="kpi-card__value">{{ value() ?? '—' }}</strong>
+    @if (hint()) {
+      <span class="kpi-card__hint">{{ hint() }}</span>
+    }
+  </div>
+</article>

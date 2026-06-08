@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Auth } from '../../../../core/services/auth';
 
@@ -10,6 +10,8 @@ import { Auth } from '../../../../core/services/auth';
 export class PublicHomePage {
   private readonly auth = inject(Auth);
   private readonly router = inject(Router);
+
+  protected readonly currentYear = computed(() => new Date().getFullYear());
 
   protected goToAdminLogin(): void {
     this.auth.logout();

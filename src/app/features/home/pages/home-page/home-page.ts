@@ -25,6 +25,7 @@ import { ColombiaDatePipe } from '../../../../core/date/colombia-date.pipe';
 import { Auth } from '../../../../core/services/auth';
 import { Parking } from '../../../../core/services/parking';
 import { ChannelAssistant } from '../../../channel/components/channel-assistant/channel-assistant';
+import { KpiCard } from '../../../../shared/components/kpi-card/kpi-card';
 
 type PrintPrompt = {
   mode: ParkingTicketMode;
@@ -63,6 +64,7 @@ function formatCop(amount: number): string {
     RouterLink,
     ChannelAssistant,
     ParkingTicketPrint,
+    KpiCard,
   ],
   templateUrl: './home-page.html',
   styleUrl: './home-page.scss',

@@ -1,0 +1,223 @@
+<section class="monthlies-page">
+  <div class="container-shell">
+    <app-page-header
+      kicker="Contratos"
+      title="Mensualidades"
+      description="Consulte los contratos vigentes o por vencer. Renueve por un nuevo periodo o cancele registros segun corresponda."
+      [sessionName]="session()?.fullName ?? null"
+      [sessionRole]="session()?.role ?? null"
+    />
+
+    @if (loadError()) {
+      <div class="status-banner status-banner--danger" role="alert">{{ loadError() }}</div>
+    }
+
+    <div class="monthlies-page__kpis">
+      <app-kpi-card
+        label="Por vencer"
+        [value]="dueSoonCount()"
+        [hint]="'En los proximos ' + daysAhead() + ' dias'"
+        icon="bi-calendar2-week"
+        tone="gold"
+      />
+      <app-kpi-card
+        label="Valor en juego"
+        [value]="dueSoonTotal() | currency: 'COP' : 'symbol' : '1.0-0' : 'es-CO'"
+        hint="Suma de los contratos proximos a vencer"
+        icon="bi-cash-stack"
+        tone="green"
+      />
+    </div>
+
+    <div class="monthlies-page__toolbar">
+      <div class="monthlies-page__search">
+        <label class="form-label" for="monthly-search">Buscar</label>
+        <input
+          id="monthly-search"
+          class="form-control"
+          type="search"
+          placeholder="Cliente, placa o tipo de vehiculo"
+          [value]="searchTerm()"
+          (input)="onSearch($any($event.target).value)"
+        />
+      </div>
+      <div class="monthlies-page__filters">
+        <label class="form-check form-switch">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            role="switch"
+            [checked]="onlyDueSoon()"
+            (change)="toggleDueSoon($any($event.target).checked)"
+          />
+          <span class="form-check-label">Solo por vencer</span>
+        </label>
+        <div class="monthlies-page__status">
+          <button
+            type="button"
+            class="btn btn-sm"
+            [class.btn-success]="status() === 'Vigentes'"
+            [class.btn-outline-secondary]="status() !== 'Vigentes'"
+            (click)="setStatus('Vigentes')"
+          >
+            Vigentes
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm"
+            [class.btn-success]="status() === 'Vencidas'"
+            [class.btn-outline-secondary]="status() !== 'Vencidas'"
+            (click)="setStatus('Vencidas')"
+          >
+            Vencidas
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm"
+            [class.btn-success]="status() === 'Todas'"
+            [class.btn-outline-secondary]="status() !== 'Todas'"
+            (click)="setStatus('Todas')"
+          >
+            Todas
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="monthlies-page__grid">
+      <article class="monthlies-card">
+        <h2>Listado de mensualidades</h2>
+        @if (monthliesResource.isLoading()) {
+          <p class="text-muted">Cargando mensualidades...</p>
+        } @else if (monthliesResource.value().length === 0) {
+          <app-empty-state
+            icon="bi-calendar-x"
+            title="No hay mensualidades en este filtro"
+            description="Cree contratos desde la opcion de vehiculos o active el filtro general."
+          />
+        } @else {
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Vehiculo</th>
+                  <th>Periodo</th>
+                  <th>Valor</th>
+                  <th>Estado</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (monthly of monthliesResource.value(); track monthly.id) {
+                  <tr
+                    [class.is-selected]="selectedId() === monthly.id"
+                    (click)="selectMonthly(monthly.id)"
+                  >
+                    <td>
+                      <div class="monthlies-card__name">{{ monthly.cliente }}</div>
+                      <small class="text-muted">{{ monthly.tarifa }}</small>
+                    </td>
+                    <td>
+                      <code>{{ monthly.placa }}</code>
+                      <small class="text-muted d-block">{{ monthly.tipoVehiculo }}</small>
+                    </td>
+                    <td>
+                      {{ monthly.fechaInicio | date: 'mediumDate' }} <br />
+                      <small class="text-muted">a {{ monthly.fechaFin | date: 'mediumDate' }}</small>
+                    </td>
+                    <td>{{ monthly.valor | currency: 'COP' : 'symbol' : '1.0-0' : 'es-CO' }}</td>
+                    <td>
+                      @if (monthly.estadoNombre === 'Vigente') {
+                        <span class="badge text-bg-success">Vigente</span>
+                      } @else {
+                        <span class="badge text-bg-warning text-dark">Vencida</span>
+                      }
+                    </td>
+                    <td class="text-end">
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-success"
+                        (click)="selectMonthly(monthly.id); $event.stopPropagation()"
+                      >
+                        Gestionar
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </article>
+
+      <article class="monthlies-card">
+        @if (selectedMonthly(); as monthly) {
+          <h2>Renovar mensualidad</h2>
+          <p class="text-muted">
+            <strong>{{ monthly.cliente }}</strong> - {{ monthly.placa }}<br />
+            Periodo actual: {{ monthly.fechaInicio | date: 'mediumDate' }} a
+            {{ monthly.fechaFin | date: 'mediumDate' }}
+          </p>
+          <form [formGroup]="renewForm" (ngSubmit)="renew()">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label" for="renew-end">Nueva fecha de fin</label>
+                <input
+                  id="renew-end"
+                  class="form-control"
+                  type="date"
+                  formControlName="newEndDate"
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="renew-value">Nuevo valor (COP)</label>
+                <input
+                  id="renew-value"
+                  class="form-control"
+                  type="number"
+                  min="0"
+                  step="100"
+                  formControlName="newValue"
+                />
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="renew-notes">Notas</label>
+                <textarea
+                  id="renew-notes"
+                  class="form-control"
+                  rows="2"
+                  formControlName="notes"
+                  maxlength="255"
+                ></textarea>
+              </div>
+            </div>
+
+            @if (error()) {
+              <div class="status-banner status-banner--danger mt-3" role="alert">{{ error() }}</div>
+            }
+            @if (feedback()) {
+              <div class="status-banner status-banner--success mt-3" role="alert">{{ feedback() }}</div>
+            }
+
+            <div class="monthlies-card__actions">
+              <button class="btn btn-outline-danger" type="button" (click)="cancel()" [disabled]="saving()">
+                Cancelar contrato
+              </button>
+              <button class="btn btn-success" type="submit" [disabled]="saving() || renewForm.invalid">
+                {{ saving() ? 'Procesando...' : 'Renovar' }}
+              </button>
+            </div>
+          </form>
+        } @else {
+          <h2>Detalle del contrato</h2>
+          <app-empty-state
+            icon="bi-arrow-repeat"
+            title="Selecciona una mensualidad"
+            description="Podras renovarla o cancelarla con un solo clic."
+          />
+        }
+      </article>
+    </div>
+  </div>
+</section>

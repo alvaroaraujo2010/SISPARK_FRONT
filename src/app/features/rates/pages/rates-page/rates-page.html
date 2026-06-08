@@ -1,0 +1,189 @@
+<section class="rates-page">
+  <div class="container-shell">
+    <app-page-header
+      kicker="Parametrizacion"
+      title="Tarifas del parqueadero"
+      description="Defina el valor por hora, dia o mensualidad para cada tipo de vehiculo. Las tarifas vigentes se usan en el calculo automatico de cobros."
+      [sessionName]="session()?.fullName ?? null"
+      [sessionRole]="session()?.role ?? null"
+    />
+
+    @if (loadError()) {
+      <div class="status-banner status-banner--danger" role="alert">{{ loadError() }}</div>
+    }
+
+    <div class="rates-page__grid">
+      <article class="rates-card">
+        <h2>Nueva tarifa</h2>
+        <p class="text-muted">
+          Al crear una nueva tarifa como activa, las anteriores para el mismo tipo de vehiculo y servicio se cierran automaticamente.
+        </p>
+        <form [formGroup]="rateForm" (ngSubmit)="submit()">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label" for="rate-name">Nombre</label>
+              <input
+                id="rate-name"
+                class="form-control"
+                formControlName="name"
+                maxlength="80"
+                placeholder="Ej. Carro por hora"
+              />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="rate-service">Tipo de servicio</label>
+              <select id="rate-service" class="form-select" formControlName="serviceTypeId">
+                <option [ngValue]="1">Hora</option>
+                <option [ngValue]="2">Dia</option>
+                <option [ngValue]="3">Mensualidad</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="rate-vehicle">Tipo de vehiculo</label>
+              <select id="rate-vehicle" class="form-select" formControlName="vehicleTypeId">
+                <option [ngValue]="0" disabled>Seleccione...</option>
+                @for (type of vehicleTypesResource.value(); track type.id) {
+                  <option [ngValue]="type.id">{{ type.name }}</option>
+                }
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="rate-value">Valor (COP)</label>
+              <input
+                id="rate-value"
+                class="form-control"
+                type="number"
+                min="0"
+                step="100"
+                formControlName="value"
+              />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="rate-fraction">Fraccion (minutos)</label>
+              <input
+                id="rate-fraction"
+                class="form-control"
+                type="number"
+                min="1"
+                formControlName="fractionMinutes"
+              />
+            </div>
+            <div class="col-12">
+              <label class="form-check form-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  role="switch"
+                  formControlName="makeActive"
+                />
+                <span class="form-check-label">Activar al crear</span>
+              </label>
+            </div>
+          </div>
+
+          @if (error()) {
+            <div class="status-banner status-banner--danger mt-3" role="alert">{{ error() }}</div>
+          }
+          @if (feedback()) {
+            <div class="status-banner status-banner--success mt-3" role="alert">{{ feedback() }}</div>
+          }
+
+          <div class="rates-card__actions">
+            <button
+              class="btn btn-success"
+              type="submit"
+              [disabled]="saving() || rateForm.invalid"
+            >
+              {{ saving() ? 'Guardando...' : 'Crear tarifa' }}
+            </button>
+          </div>
+        </form>
+      </article>
+
+      <article class="rates-card rates-card--wide">
+        <header class="rates-card__header">
+          <h2>Tarifas configuradas</h2>
+          <label class="form-check form-switch">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              role="switch"
+              [checked]="includeInactive()"
+              (change)="toggleInactive($any($event.target).checked)"
+            />
+            <span class="form-check-label">Mostrar inactivas</span>
+          </label>
+        </header>
+        @if (ratesResource.isLoading()) {
+          <p class="text-muted">Cargando tarifas...</p>
+        } @else if (ratesResource.value().length === 0) {
+          <app-empty-state
+            icon="bi-cash-coin"
+            title="Sin tarifas registradas"
+            description="Cree la primera tarifa para comenzar a cobrar."
+          />
+        } @else {
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Servicio</th>
+                  <th>Tipo vehiculo</th>
+                  <th>Valor</th>
+                  <th>Fraccion</th>
+                  <th>Vigencia</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (rate of ratesResource.value(); track rate.id) {
+                  <tr>
+                    <td><strong>{{ rate.nombre }}</strong></td>
+                    <td>{{ rate.servicio }}</td>
+                    <td>
+                      <button
+                        type="button"
+                        class="badge text-bg-light border-0"
+                        (click)="applyVehicleType(rate.idTipoVehiculo)"
+                      >
+                        {{ rate.tipoVehiculo }}
+                      </button>
+                    </td>
+                    <td>{{ rate.valor | currency: 'COP' : 'symbol' : '1.0-0' : 'es-CO' }}</td>
+                    <td>
+                      @if (rate.fraccionMinutos) {
+                        {{ rate.fraccionMinutos }} min
+                      } @else {
+                        <span class="text-muted">—</span>
+                      }
+                    </td>
+                    <td>
+                      <span class="rates-card__dates">
+                        <i class="bi bi-calendar-event" aria-hidden="true"></i>
+                        {{ rate.fechaInicioVigencia | date: 'mediumDate' }}
+                        @if (rate.fechaFinVigencia) {
+                          <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                          {{ rate.fechaFinVigencia | date: 'mediumDate' }}
+                        } @else {
+                          <span class="rates-card__badge">Vigente</span>
+                        }
+                      </span>
+                    </td>
+                    <td>
+                      @if (rate.isActive) {
+                        <span class="badge text-bg-success">Activa</span>
+                      } @else {
+                        <span class="badge text-bg-secondary">Inactiva</span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </article>
+    </div>
+  </div>
+</section>

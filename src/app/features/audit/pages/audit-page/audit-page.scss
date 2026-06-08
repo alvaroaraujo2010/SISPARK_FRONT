@@ -1,0 +1,27 @@
+.audit-page__toolbar {
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  background: #fff;
+  padding: 1rem 1.25rem;
+  border-radius: 18px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+  margin-bottom: 1.5rem;
+}
+
+.audit-card {
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 20px;
+  padding: 1.25rem;
+  box-shadow: 0 14px 36px rgba(15, 23, 42, 0.05);
+}
+
+.audit-card__detail {
+  max-width: 360px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--sp-muted);
+  font-size: 0.9rem;
+}

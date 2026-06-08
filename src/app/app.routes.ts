@@ -12,6 +12,21 @@ import { ServicesPage } from './features/services/pages/services-page/services-p
 import { ParkingLotPage } from './features/parking-lot/pages/parking-lot-page/parking-lot-page';
 import { UsersPage } from './features/users/pages/users-page/users-page';
 import { ReportsPage } from './features/reports/pages/reports-page/reports-page';
+import { ClientsPage } from './features/clients/pages/clients-page/clients-page';
+import { RatesPage } from './features/rates/pages/rates-page/rates-page';
+import { MonthliesPage } from './features/monthlies/pages/monthlies-page/monthlies-page';
+import { CashPage } from './features/cash/pages/cash-page/cash-page';
+import { ProfilePage } from './features/profile/pages/profile-page/profile-page';
+import { AuditPage } from './features/audit/pages/audit-page/audit-page';
+
+const adminOnly = roleGuard([SystemRoles.administrador]);
+const supervisorOrAdmin = roleGuard([SystemRoles.administrador, SystemRoles.supervisor]);
+const operational = roleGuard([
+  SystemRoles.administrador,
+  SystemRoles.operador,
+  SystemRoles.cajero,
+]);
+const cashierOrAdmin = roleGuard([SystemRoles.administrador, SystemRoles.cajero]);
 
 export const routes: Routes = [
   {
@@ -45,31 +60,66 @@ export const routes: Routes = [
         path: 'inicio',
         component: HomePage,
         title: 'Inicio administrativo | SISPARK',
-        canActivate: [roleGuard([SystemRoles.administrador, SystemRoles.operador, SystemRoles.cajero])],
+        canActivate: [operational],
       },
       {
         path: 'vehiculos',
         component: ServicesPage,
         title: 'Registro de vehiculos | SISPARK',
-        canActivate: [roleGuard([SystemRoles.administrador])],
+        canActivate: [adminOnly],
+      },
+      {
+        path: 'clientes',
+        component: ClientsPage,
+        title: 'Clientes | SISPARK',
+        canActivate: [operational],
+      },
+      {
+        path: 'tarifas',
+        component: RatesPage,
+        title: 'Tarifas | SISPARK',
+        canActivate: [adminOnly],
+      },
+      {
+        path: 'mensualidades',
+        component: MonthliesPage,
+        title: 'Mensualidades | SISPARK',
+        canActivate: [operational],
+      },
+      {
+        path: 'caja',
+        component: CashPage,
+        title: 'Caja y pagos | SISPARK',
+        canActivate: [cashierOrAdmin],
       },
       {
         path: 'parqueadero',
         component: ParkingLotPage,
         title: 'Administracion del parqueadero | SISPARK',
-        canActivate: [roleGuard([SystemRoles.administrador])],
+        canActivate: [adminOnly],
       },
       {
         path: 'usuarios',
         component: UsersPage,
         title: 'Usuarios | SISPARK',
-        canActivate: [roleGuard([SystemRoles.administrador])],
+        canActivate: [adminOnly],
       },
       {
         path: 'reportes',
         component: ReportsPage,
         title: 'Reportes | SISPARK',
-        canActivate: [roleGuard([SystemRoles.administrador, SystemRoles.supervisor])],
+        canActivate: [supervisorOrAdmin],
+      },
+      {
+        path: 'auditoria',
+        component: AuditPage,
+        title: 'Auditoria | SISPARK',
+        canActivate: [supervisorOrAdmin],
+      },
+      {
+        path: 'perfil',
+        component: ProfilePage,
+        title: 'Mi perfil | SISPARK',
       },
     ],
   },

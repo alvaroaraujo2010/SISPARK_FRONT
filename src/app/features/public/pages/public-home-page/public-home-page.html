@@ -1,95 +1,151 @@
 <section class="public-hero">
-  <div class="container-shell public-hero__grid">
+  <div class="public-hero__bg" aria-hidden="true">
+    <img src="https://images.unsplash.com/photo-1506521705437-3c1d0b3b8b4e?w=1920&q=80" alt="" loading="eager" />
+    <div class="public-hero__overlay"></div>
+  </div>
+
+  <div class="container-shell public-hero__content">
     <div class="public-hero__copy">
       <div class="public-trustbar">
         <span class="public-hero__eyebrow">SISPARK</span>
-        <span class="public-trustbar__chip"><i class="bi bi-shield-check"></i> Operacion segura</span>
+        <span class="public-trustbar__chip"><i class="bi bi-shield-check"></i> Operación segura y trazable</span>
       </div>
 
-      <h1>Gestion profesional para parqueaderos con control, trazabilidad y operacion en tiempo real.</h1>
-      <p>
-        Esta es la zona institucional del sistema. Desde aqui presentamos la plataforma y dirigimos a
-        operadores, cajeros y administradores hacia el modulo seguro de trabajo.
+      <h1>Gestión profesional para parqueaderos con control, trazabilidad y operación en tiempo real.</h1>
+      <p class="public-hero__lead">
+        Plataforma integral para administradores, operadores y cajeros. Control de ingresos, salidas, pagos, mensualidades y auditoría desde una sola base segura.
       </p>
 
       <div class="public-hero__actions">
-        <button class="btn btn-success" type="button" (click)="goToAdminLogin()">
-          Entrar a zona administrativa
+        <button class="btn btn-success btn-lg" type="button" (click)="goToAdminLogin()">
+          <i class="bi bi-box-arrow-in-right"></i> Acceder al panel administrativo
         </button>
-        <button class="btn btn-outline-dark" type="button" (click)="goToAdminLogin()">
-          Ingreso de operadores
+        <button class="btn btn-outline-light btn-lg" type="button" (click)="goToAdminLogin()">
+          <i class="bi bi-person-badge"></i> Ingreso de operadores
         </button>
       </div>
 
       <div class="public-metrics">
         <article>
-          <strong>Trazabilidad</strong>
-          <span>Cada accion queda asociada al usuario autenticado.</span>
+          <div class="public-metric__icon"><i class="bi bi-shield-lock-fill"></i></div>
+          <strong>Trazabilidad total</strong>
+          <span>Cada acción queda vinculada al usuario autenticado.</span>
         </article>
         <article>
-          <strong>Operacion</strong>
-          <span>Ingreso, salida, registros y control diario del parqueadero.</span>
+          <div class="public-metric__icon"><i class="bi bi-speedometer2"></i></div>
+          <strong>Operación en vivo</strong>
+          <span>Tablero en tiempo real: ocupación, ingresos, alertas.</span>
         </article>
         <article>
-          <strong>Escalabilidad</strong>
-          <span>Modelo preparado para pagos, mensualidades y auditoria.</span>
+          <div class="public-metric__icon"><i class="bi bi-graph-up-arrow"></i></div>
+          <strong>Listo para escalar</strong>
+          <span>Pagos, mensualidades, auditoría y reportes listos.</span>
         </article>
       </div>
     </div>
 
-    <div class="public-hero__panel">
-      <div class="public-hero__panel-top">
+    <aside class="public-hero__panel" aria-label="Resumen de capacidades">
+      <div class="public-hero__panel-header">
         <span class="logo-tile logo-tile--hero" aria-hidden="true">
           <img src="images/logo_moderno_de_sispark.png" alt="SisPark" decoding="async" />
         </span>
         <div>
           <h2>Centro digital del parqueadero</h2>
-          <p>Una base unica para control operativo, usuarios y crecimiento comercial.</p>
+          <p>Una base única para control operativo, usuarios y crecimiento comercial.</p>
         </div>
       </div>
 
-      <div class="public-hero__panel-grid">
+      <div class="public-hero__features">
         <article>
-          <i class="bi bi-speedometer2"></i>
+          <div class="public-feature__icon"><i class="bi bi-speedometer2"></i></div>
           <div>
             <strong>Tablero operativo</strong>
-            <span>Vista rapida de ocupacion, ingresos y alertas.</span>
+            <span>Vista rápida de ocupación, ingresos y alertas.</span>
           </div>
         </article>
         <article>
-          <i class="bi bi-car-front"></i>
+          <div class="public-feature__icon"><i class="bi bi-car-front"></i></div>
           <div>
             <strong>Registro maestro</strong>
-            <span>Clientes y vehiculos bajo control administrativo.</span>
+            <span>Clientes y vehículos bajo control administrativo.</span>
           </div>
         </article>
         <article>
-          <i class="bi bi-credit-card-2-front"></i>
+          <div class="public-feature__icon"><i class="bi bi-credit-card-2-front"></i></div>
           <div>
             <strong>Escenario de caja</strong>
-            <span>Preparado para pagos y mensualidades.</span>
+            <span>Preparado para pagos, mensualidades y facturación.</span>
           </div>
         </article>
       </div>
+    </aside>
+  </div>
+</section>
+
+<section class="public-benefits">
+  <div class="container-shell">
+    <header class="public-section__header">
+      <span class="public-section__eyebrow">Por qué SISPARK</span>
+      <h2>Diseñado para la operación diaria y el crecimiento</h2>
+      <p>Cada módulo está pensado para resolver problemas reales de la gestión de parqueaderos.</p>
+    </header>
+
+    <div class="public-benefits__grid">
+      <article class="public-benefit">
+        <div class="public-benefit__icon"><i class="bi bi-person-badge-fill"></i></div>
+        <h3>Identidad operativa</h3>
+        <p>Los registros de clientes, vehículos y movimientos quedan asociados al usuario autenticado. Trazabilidad completa sin esfuerzo.</p>
+      </article>
+
+      <article class="public-benefit">
+        <div class="public-benefit__icon"><i class="bi bi-shield-check"></i></div>
+        <h3>Seguridad y roles</h3>
+        <p>Administrador, Operador, Cajero, Supervisor. Cada rol con permisos exactos. Auditoría automática de cada acción.</p>
+      </article>
+
+      <article class="public-benefit">
+        <div class="public-benefit__icon"><i class="bi bi-cash-coin"></i></div>
+        <h3>Caja y pagos listos</h3>
+        <p>Efectivo, tarjeta, transferencia, QR. Cierre diario por operador y método. Facturación electrónica integrada.</p>
+      </article>
+
+      <article class="public-benefit">
+        <div class="public-benefit__icon"><i class="bi bi-calendar2-week"></i></div>
+        <h3>Mensualidades automáticas</h3>
+        <p>Creación, renovación y cancelación de contratos. Alertas de vencimiento y renovación en un clic.</p>
+      </article>
+
+      <article class="public-benefit">
+        <div class="public-benefit__icon"><i class="bi bi-graph-up-arrow"></i></div>
+        <h3>Reportes ejecutivos</h3>
+        <p>Ingresos, ocupación, rendimiento de operadores, contratos por vencer. Todo exportable y en tiempo real.</p>
+      </article>
+
+      <article class="public-benefit">
+        <div class="public-benefit__icon"><i class="bi bi-whatsapp"></i></div>
+        <h3>Canal conversacional</h3>
+        <p>Integración WhatsApp para notificaciones y asistencia al operador desde el móvil.</p>
+      </article>
     </div>
   </div>
 </section>
 
-<section class="public-info">
-  <div class="container-shell public-info__grid">
-    <article>
-      <h3>Area administrativa</h3>
-      <p>Ingreso, salida, registro de vehiculos, control de pagos y operacion diaria centralizada.</p>
-    </article>
-
-    <article>
-      <h3>Seguridad</h3>
-      <p>Toda accion operativa queda asociada al usuario autenticado dentro del sistema.</p>
-    </article>
-
-    <article>
-      <h3>Crecimiento</h3>
-      <p>La base nueva ya esta pensada para clientes, vehiculos, mensualidades, pagos y auditoria.</p>
-    </article>
+<section class="public-cta">
+  <div class="container-shell">
+    <div class="public-cta__card">
+      <div class="public-cta__copy">
+        <h2>¿Listo para profesionalizar tu parqueadero?</h2>
+        <p>Accede al panel administrativo y comienza a operar con control total desde el primer día.</p>
+      </div>
+      <button class="btn btn-success btn-xl" type="button" (click)="goToAdminLogin()">
+        <i class="bi bi-box-arrow-in-right"></i> Entrar a la zona administrativa
+      </button>
+    </div>
   </div>
 </section>
+
+<footer class="public-footer-minimal" role="contentinfo">
+  <div class="container-shell">
+    <p>&copy; {{ currentYear() }} SISPARK. Sistema integral de gestión para parqueaderos.</p>
+  </div>
+</footer>

@@ -1,0 +1,126 @@
+<section class="audit-page">
+  <div class="container-shell">
+    <app-page-header
+      kicker="Auditoria"
+      title="Bitacora del sistema"
+      description="Registro automatico de las acciones realizadas por los usuarios. Filtra por fecha, modulo o accion."
+      [sessionName]="session()?.fullName ?? null"
+      [sessionRole]="session()?.role ?? null"
+    />
+
+    @if (loadError()) {
+      <div class="status-banner status-banner--danger" role="alert">{{ loadError() }}</div>
+    }
+
+    <div class="audit-page__toolbar">
+      <div>
+        <label class="form-label" for="audit-from">Desde</label>
+        <input
+          id="audit-from"
+          class="form-control"
+          type="date"
+          [value]="from()"
+          (change)="setFrom($any($event.target).value)"
+        />
+      </div>
+      <div>
+        <label class="form-label" for="audit-to">Hasta</label>
+        <input
+          id="audit-to"
+          class="form-control"
+          type="date"
+          [value]="to()"
+          (change)="setTo($any($event.target).value)"
+        />
+      </div>
+      <div>
+        <label class="form-label" for="audit-modulo">Modulo</label>
+        <input
+          id="audit-modulo"
+          class="form-control"
+          type="text"
+          list="audit-modulo-options"
+          [value]="modulo()"
+          (input)="setModulo($any($event.target).value)"
+          placeholder="usuarios, mensualidades..."
+        />
+        <datalist id="audit-modulo-options">
+          <option value="usuarios"></option>
+          <option value="clientes"></option>
+          <option value="tarifas"></option>
+          <option value="mensualidades"></option>
+          <option value="pagos"></option>
+          <option value="auth"></option>
+        </datalist>
+      </div>
+      <div>
+        <label class="form-label" for="audit-accion">Accion</label>
+        <input
+          id="audit-accion"
+          class="form-control"
+          type="text"
+          list="audit-accion-options"
+          [value]="accion()"
+          (input)="setAccion($any($event.target).value)"
+          placeholder="crear, actualizar, activar..."
+        />
+        <datalist id="audit-accion-options">
+          <option value="crear"></option>
+          <option value="actualizar"></option>
+          <option value="activar"></option>
+          <option value="desactivar"></option>
+          <option value="renovar"></option>
+          <option value="cancelar"></option>
+          <option value="cambio-password"></option>
+          <option value="reset-password"></option>
+        </datalist>
+      </div>
+    </div>
+
+    @if (auditResource.isLoading()) {
+      <p class="text-muted">Cargando bitacora...</p>
+    } @else if (auditResource.value().length === 0) {
+      <app-empty-state
+        icon="bi-shield-check"
+        title="Sin eventos para los filtros aplicados"
+        description="Ajusta los criterios de busqueda o limpia los filtros."
+      />
+    } @else {
+      <article class="audit-card">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Usuario</th>
+                <th>Modulo</th>
+                <th>Accion</th>
+                <th>Entidad</th>
+                <th>Detalle</th>
+                <th>IP</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (entry of auditResource.value(); track entry.id) {
+                <tr>
+                  <td>{{ entry.fecha | date: 'short' }}</td>
+                  <td>{{ entry.nombreUsuario || 'Sistema' }}</td>
+                  <td><span class="badge text-bg-light">{{ entry.modulo }}</span></td>
+                  <td><span class="badge text-bg-info text-dark">{{ entry.accion }}</span></td>
+                  <td>
+                    <code>{{ entry.entidad || '—' }}</code>
+                    @if (entry.entidadId) {
+                      <small class="text-muted"> #{{ entry.entidadId }}</small>
+                    }
+                  </td>
+                  <td class="audit-card__detail">{{ entry.detalle || '—' }}</td>
+                  <td><small class="text-muted">{{ entry.direccionIp || '—' }}</small></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </article>
+    }
+  </div>
+</section>

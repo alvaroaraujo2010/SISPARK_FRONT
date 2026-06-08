@@ -90,7 +90,7 @@
 }
 
 .command-shell {
-  padding: 2rem 0 0.5rem;
+  padding: 1.25rem 0 0.5rem;
 }
 
 .command-top {
@@ -99,6 +99,14 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 1.25rem 1.75rem;
+  padding: 1.55rem;
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at top left, rgba(0, 204, 102, 0.18), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(240, 174, 33, 0.14), transparent 28%),
+    rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(17, 29, 23, 0.07);
+  box-shadow: var(--sp-shadow-md);
 }
 
 .command-top__intro {
@@ -118,7 +126,7 @@
 }
 
 .command-top__intro h1 {
-  font-size: clamp(2.2rem, 4vw, 4rem);
+  font-size: clamp(2rem, 3.4vw, 3.5rem);
   line-height: 1.05;
   margin-bottom: 1rem;
   font-weight: 800;
@@ -179,7 +187,7 @@
 }
 
 .plate-section {
-  padding-top: 0.75rem;
+  padding-top: 0.5rem;
 }
 
 .section-heading {
@@ -255,6 +263,9 @@
 
 .operation-card--plate {
   max-width: 100%;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(247, 250, 248, 0.92)),
+    radial-gradient(circle at top right, rgba(0, 204, 102, 0.16), transparent 36%);
 }
 
 .operation-card--full {
@@ -273,6 +284,45 @@
   gap: 1rem;
   align-items: start;
   margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.plate-header__session {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.12rem;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  background: rgba(0, 204, 102, 0.16);
+  border: 1px solid rgba(0, 153, 77, 0.24);
+  box-shadow: 0 8px 24px rgba(0, 153, 77, 0.1);
+  max-width: min(100%, 280px);
+}
+
+.plate-header__session .session-oval__label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #0d7f47;
+}
+
+.plate-header__session .session-oval__name {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #063822;
+  line-height: 1.25;
+}
+
+.plate-header__session .session-oval__role {
+  display: block;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #0d7f47;
+  opacity: 0.9;
 }
 
 .operation-card__header h2 {
@@ -284,6 +334,13 @@
 .operation-card__header i {
   font-size: 1.45rem;
   color: #0c7d46;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 18px;
+  background: rgba(0, 204, 102, 0.12);
 }
 
 .operation-card__copy {
@@ -294,6 +351,17 @@
 .plate-form {
   display: grid;
   gap: 0.95rem;
+}
+
+.plate-form #plate-input {
+  min-height: 4rem;
+  border-radius: 22px;
+  font-size: clamp(1.6rem, 4vw, 2.35rem);
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  background:
+    linear-gradient(180deg, #fff, rgba(247, 250, 248, 0.96));
+  border-color: rgba(0, 153, 77, 0.18);
 }
 
 .plate-form__actions {

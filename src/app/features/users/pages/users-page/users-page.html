@@ -1,20 +1,12 @@
 <section class="users-page">
   <div class="container-shell">
-    <header class="users-page__header">
-      <div>
-        <span class="section-kicker">Seguridad</span>
-        <h1>Usuarios del sistema</h1>
-        <p>
-          Cree cuentas para el equipo. <strong>Administrador</strong> tiene acceso total;
-          <strong>Operario</strong> solo ingreso, salida y WhatsApp;
-          <strong>Supervisor</strong> consultará reportes mensuales (próximamente).
-        </p>
-      </div>
-      <div class="session-oval session-oval--compact">
-        <span class="session-oval__label">Sesión</span>
-        <strong class="session-oval__name">{{ session()?.fullName }}</strong>
-      </div>
-    </header>
+    <app-page-header
+      kicker="Seguridad"
+      title="Usuarios del sistema"
+      description="Cree cuentas para el equipo, asigne roles y gestione el estado de cada uno. Los cambios quedan registrados en la bitacora."
+      [sessionName]="session()?.fullName ?? null"
+      [sessionRole]="session()?.role ?? null"
+    />
 
     @if (loadError()) {
       <div class="status-banner status-banner--danger" role="alert">{{ loadError() }}</div>
@@ -71,13 +63,6 @@
             </div>
           </div>
 
-          @if (error()) {
-            <div class="status-banner status-banner--danger mt-3" role="alert">{{ error() }}</div>
-          }
-          @if (feedback()) {
-            <div class="status-banner status-banner--success mt-3" role="alert">{{ feedback() }}</div>
-          }
-
           <div class="users-card__actions">
             <button class="btn btn-success" type="submit" [disabled]="isSaving() || userForm.invalid">
               {{ isSaving() ? 'Guardando...' : 'Crear usuario' }}
@@ -90,11 +75,15 @@
         <h2>Usuarios registrados</h2>
         @if (usersResource.isLoading()) {
           <p class="text-muted">Cargando...</p>
-        } @else if ((usersResource.value()?.length ?? 0) === 0) {
-          <p class="text-muted">Aún no hay usuarios además del administrador inicial.</p>
+        } @else if (usersResource.value().length === 0) {
+          <app-empty-state
+            icon="bi-people"
+            title="Aun no hay usuarios"
+            description="Cree el primero con el formulario de la izquierda."
+          />
         } @else {
           <div class="table-responsive">
-            <table class="table table-sm align-middle">
+            <table class="table table-hover align-middle">
               <thead>
                 <tr>
                   <th>Nombre</th>
@@ -102,11 +91,12 @@
                   <th>Rol</th>
                   <th>Estado</th>
                   <th>Último acceso</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
                 @for (user of usersResource.value(); track user.id) {
-                  <tr>
+                  <tr [class.is-selected]="selectedId() === user.id">
                     <td>{{ user.firstName }} {{ user.lastName }}</td>
                     <td><code>{{ user.username }}</code></td>
                     <td>{{ roleLabel(user.roleName) }}</td>
@@ -124,6 +114,22 @@
                         <span class="text-muted">Sin acceso</span>
                       }
                     </td>
+                    <td class="text-end">
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-success me-1"
+                        (click)="selectUser(user.id)"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary"
+                        (click)="startReset(user.id)"
+                      >
+                        Reset clave
+                      </button>
+                    </td>
                   </tr>
                 }
               </tbody>
@@ -131,6 +137,107 @@
           </div>
         }
       </article>
+
+      @if (selectedUser(); as user) {
+        <article class="users-card users-card--wide">
+          <h2>Editar usuario</h2>
+          <p class="text-muted">
+            <strong>{{ user.firstName }} {{ user.lastName }}</strong> — {{ roleLabel(user.roleName) }}
+          </p>
+          <form [formGroup]="editForm" (ngSubmit)="saveEdit()">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label" for="edit-first-name">Nombres</label>
+                <input id="edit-first-name" class="form-control" formControlName="firstName" maxlength="100" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="edit-last-name">Apellidos</label>
+                <input id="edit-last-name" class="form-control" formControlName="lastName" maxlength="100" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="edit-email">Correo</label>
+                <input id="edit-email" class="form-control" type="email" formControlName="email" maxlength="120" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="edit-role">Tipo de usuario</label>
+                <select id="edit-role" class="form-select" formControlName="roleId">
+                  @for (role of rolesResource.value(); track role.id) {
+                    <option [ngValue]="role.id">
+                      {{ roleLabel(role.name) }} — {{ role.description }}
+                    </option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="users-card__actions users-card__actions--split">
+              <button class="btn btn-outline-secondary" type="button" (click)="clearSelection()">
+                Cerrar
+              </button>
+              <div class="users-card__action-cluster">
+                <button
+                  class="btn"
+                  [class.btn-outline-danger]="user.isActive"
+                  [class.btn-outline-success]="!user.isActive"
+                  type="button"
+                  (click)="toggleActive()"
+                  [disabled]="isSaving()"
+                >
+                  {{ user.isActive ? 'Desactivar' : 'Activar' }}
+                </button>
+                <button
+                  class="btn btn-success"
+                  type="submit"
+                  [disabled]="isSaving() || editForm.invalid"
+                >
+                  {{ isSaving() ? 'Guardando...' : 'Guardar cambios' }}
+                </button>
+              </div>
+            </div>
+          </form>
+        </article>
+      }
+
+      @if (resettingId() !== null) {
+        <article class="users-card users-card--wide">
+          <h2>Restablecer contraseña</h2>
+          <p class="text-muted">Asigne una nueva contraseña temporal para el usuario seleccionado.</p>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" for="reset-password">Nueva contraseña</label>
+              <input
+                id="reset-password"
+                class="form-control"
+                type="password"
+                minlength="6"
+                [value]="resetPassword()"
+                (input)="resetPassword.set($any($event.target).value)"
+                autocomplete="new-password"
+              />
+            </div>
+          </div>
+          <div class="users-card__actions users-card__actions--split">
+            <button class="btn btn-outline-secondary" type="button" (click)="cancelReset()">
+              Cancelar
+            </button>
+            <button
+              class="btn btn-success"
+              type="button"
+              (click)="confirmReset()"
+              [disabled]="isSaving() || resetPassword().length < 6"
+            >
+              Restablecer
+            </button>
+          </div>
+        </article>
+      }
     </div>
+
+    @if (error()) {
+      <div class="status-banner status-banner--danger mt-3" role="alert">{{ error() }}</div>
+    }
+    @if (feedback()) {
+      <div class="status-banner status-banner--success mt-3" role="alert">{{ feedback() }}</div>
+    }
   </div>
 </section>

@@ -1,29 +1,15 @@
 <header class="navbar-shell">
   <div class="container-shell navbar-shell__inner">
-    <a class="brand" [routerLink]="homeLink()">
-      <span class="logo-tile logo-tile--nav" aria-hidden="true">
-        <img src="images/logo_moderno_de_sispark.png" alt="SisPark" decoding="async" />
-      </span>
-      <div>
-        <span>SISPARK</span>
-        <small>Modulo administrativo</small>
-      </div>
-    </a>
-
-    <div class="navbar-shell__cluster">
-      <nav class="nav-links">
-        @if (showOperations()) {
-          <a routerLink="/admin/inicio" routerLinkActive="active">Inicio</a>
-        }
-        @if (showAdminMenu()) {
-          <a routerLink="/admin/vehiculos" routerLinkActive="active">Vehiculos</a>
-          <a routerLink="/admin/parqueadero" routerLinkActive="active">Parqueadero</a>
-          <a routerLink="/admin/usuarios" routerLinkActive="active">Usuarios</a>
-        }
-        @if (showReports()) {
-          <a routerLink="/admin/reportes" routerLinkActive="active">Reportes</a>
-        }
-      </nav>
+    <div class="navbar-shell__top">
+      <a class="brand" [routerLink]="homeLink()" (click)="closeMobileMenu()">
+        <span class="logo-tile logo-tile--nav" aria-hidden="true">
+          <img src="images/logo_moderno_de_sispark.png" alt="SisPark" decoding="async" />
+        </span>
+        <div>
+          <span>SISPARK</span>
+          <small>Modulo administrativo</small>
+        </div>
+      </a>
 
       @if (isAuthenticated()) {
         <div class="nav-session">
@@ -31,10 +17,66 @@
             <small>Sesion activa</small>
             <strong>{{ session()?.fullName }}</strong>
           </span>
+          <a class="nav-profile" routerLink="/admin/perfil" routerLinkActive="active" title="Mi perfil" (click)="closeMobileMenu()">
+            <i class="bi bi-person-circle" aria-hidden="true"></i>
+            <span>Mi perfil</span>
+          </a>
           <span class="nav-role">{{ roleLabel(session()?.role) }}</span>
           <button class="nav-logout" type="button" (click)="logout()">Salir</button>
         </div>
       }
+
+      <button
+        class="nav-toggle"
+        type="button"
+        [attr.aria-expanded]="mobileMenuOpen()"
+        aria-controls="main-menu"
+        aria-label="Abrir menu principal"
+        (click)="toggleMobileMenu()"
+      >
+        <i class="bi" [class.bi-list]="!mobileMenuOpen()" [class.bi-x-lg]="mobileMenuOpen()" aria-hidden="true"></i>
+        <span>Menu</span>
+      </button>
     </div>
+
+    <nav id="main-menu" class="nav-links" [class.nav-links--open]="mobileMenuOpen()" aria-label="Menu principal">
+      @if (showOperations() || showCashMenu()) {
+        <section class="nav-group" aria-label="Operacion">
+          <span class="nav-group__label">Operacion</span>
+          <div class="nav-group__links">
+            @if (showOperations()) {
+              <a routerLink="/admin/inicio" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-speedometer2" aria-hidden="true"></i>Inicio</a>
+              <a routerLink="/admin/vehiculos" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-car-front" aria-hidden="true"></i>Vehiculos</a>
+              <a routerLink="/admin/clientes" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-people" aria-hidden="true"></i>Clientes</a>
+              <a routerLink="/admin/mensualidades" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-calendar2-week" aria-hidden="true"></i>Mensualidades</a>
+            }
+            @if (showCashMenu()) {
+              <a routerLink="/admin/caja" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-cash-coin" aria-hidden="true"></i>Caja</a>
+            }
+          </div>
+        </section>
+      }
+
+      @if (showAdminMenu()) {
+        <section class="nav-group" aria-label="Administracion">
+          <span class="nav-group__label">Administracion</span>
+          <div class="nav-group__links">
+            <a routerLink="/admin/tarifas" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-tags" aria-hidden="true"></i>Tarifas</a>
+            <a routerLink="/admin/parqueadero" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-p-square" aria-hidden="true"></i>Parqueadero</a>
+            <a routerLink="/admin/usuarios" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-person-gear" aria-hidden="true"></i>Usuarios</a>
+          </div>
+        </section>
+      }
+
+      @if (showReports()) {
+        <section class="nav-group" aria-label="Supervision">
+          <span class="nav-group__label">Supervision</span>
+          <div class="nav-group__links">
+            <a routerLink="/admin/reportes" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-graph-up-arrow" aria-hidden="true"></i>Reportes</a>
+            <a routerLink="/admin/auditoria" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-shield-check" aria-hidden="true"></i>Auditoria</a>
+          </div>
+        </section>
+      }
+    </nav>
   </div>
 </header>
