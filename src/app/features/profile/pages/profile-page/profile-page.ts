@@ -3,6 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Auth } from '../../../../core/services/auth';
+import { AlertService } from '../../../../core/services/alert';
 import { getHttpErrorMessage } from '../../../../core/http/problem-details';
 import { PageHeader } from '../../../../shared/components/page-header/page-header';
 
@@ -15,6 +16,7 @@ import { PageHeader } from '../../../../shared/components/page-header/page-heade
 export class ProfilePage {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(Auth);
+  private readonly alert = inject(AlertService);
 
   protected readonly session = this.auth.session;
   protected readonly saving = signal(false);
@@ -35,7 +37,9 @@ export class ProfilePage {
 
     const value = this.passwordForm.getRawValue();
     if (value.newPassword !== value.confirmPassword) {
-      this.error.set('La confirmacion de la nueva contraseña no coincide.');
+      const message = 'La confirmacion de la nueva contraseña no coincide.';
+      this.error.set(message);
+      void this.alert.info('Verifique la contraseña', message);
       return;
     }
 
@@ -51,12 +55,16 @@ export class ProfilePage {
       .subscribe({
         next: () => {
           this.saving.set(false);
-          this.feedback.set('Contraseña actualizada correctamente.');
+          const message = 'Contraseña actualizada correctamente.';
+          this.feedback.set(message);
+          void this.alert.success('Contraseña actualizada', message);
           this.passwordForm.reset({ currentPassword: '', newPassword: '', confirmPassword: '' });
         },
         error: (err: HttpErrorResponse) => {
           this.saving.set(false);
-          this.error.set(getHttpErrorMessage(err, 'No fue posible cambiar la contraseña.'));
+          const message = getHttpErrorMessage(err, 'No fue posible cambiar la contraseña.');
+          this.error.set(message);
+          void this.alert.error('Error al cambiar contraseña', message);
         },
       });
   }

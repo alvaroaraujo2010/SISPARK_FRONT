@@ -5,6 +5,14 @@
   align-items: flex-end;
   gap: 1.5rem;
   margin-bottom: 1.5rem;
+  padding: clamp(1.2rem, 3vw, 1.8rem);
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(35, 242, 143, 0.22), transparent 28%),
+    radial-gradient(circle at 90% 0%, rgba(246, 195, 74, 0.14), transparent 24%),
+    linear-gradient(135deg, #071017 0%, #0d171f 56%, #123421 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 26px 70px rgba(7, 16, 23, 0.2);
 }
 
 .page-header__intro {
@@ -17,21 +25,25 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   font-weight: 600;
-  color: var(--sp-green-deep);
+  color: #23f28f;
   margin-bottom: 0.4rem;
 }
 
 .page-header__title {
-  font-size: 1.85rem;
-  font-weight: 700;
+  font-size: clamp(2rem, 3.4vw, 3.2rem);
+  font-weight: 900;
   margin-bottom: 0.4rem;
-  color: var(--sp-ink);
+  color: #fff;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  text-shadow: 0 12px 35px rgba(0, 0, 0, 0.28);
 }
 
 .page-header__description {
-  color: var(--sp-muted);
+  color: rgba(255, 255, 255, 0.72);
   font-size: 0.96rem;
   margin: 0;
+  line-height: 1.65;
 }
 
 .page-header__session {
@@ -39,24 +51,26 @@
   align-items: center;
   gap: 0.65rem;
   padding: 0.6rem 1rem;
-  background: #ffffff;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 999px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(18px);
+  color: #fff;
 }
 
 .page-header__session-label {
   font-size: 0.7rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--sp-muted);
+  color: rgba(255, 255, 255, 0.58);
   font-weight: 600;
 }
 
 .page-header__session-role {
   padding: 0.15rem 0.65rem;
-  background: var(--sp-green-soft);
-  color: var(--sp-green-deep);
+  background: rgba(35, 242, 143, 0.16);
+  color: #9cf6c6;
   border-radius: 999px;
   font-size: 0.78rem;
   font-weight: 600;

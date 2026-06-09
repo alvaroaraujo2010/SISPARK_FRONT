@@ -5,6 +5,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { AdminService } from '../../../../core/services/admin';
 import { RatesService } from '../../../../core/services/rates';
+import { AlertService } from '../../../../core/services/alert';
 import { Auth } from '../../../../core/services/auth';
 import { getHttpErrorMessage } from '../../../../core/http/problem-details';
 import { PageHeader } from '../../../../shared/components/page-header/page-header';
@@ -28,6 +29,7 @@ export class RatesPage {
   private readonly ratesService = inject(RatesService);
   private readonly adminService = inject(AdminService);
   private readonly auth = inject(Auth);
+  private readonly alert = inject(AlertService);
 
   protected readonly session = this.auth.session;
   protected readonly includeInactive = signal(false);
@@ -96,13 +98,17 @@ export class RatesPage {
       .subscribe({
         next: () => {
           this.saving.set(false);
-          this.feedback.set('Tarifa creada correctamente.');
+          const message = 'Tarifa creada correctamente.';
+          this.feedback.set(message);
+          void this.alert.success('Tarifa creada', message);
           this.rateForm.reset({ serviceTypeId: 1, vehicleTypeId: 0, value: 0, fractionMinutes: 60, makeActive: true });
           this.ratesResource.reload();
         },
         error: (err: HttpErrorResponse) => {
           this.saving.set(false);
-          this.error.set(getHttpErrorMessage(err, 'No fue posible crear la tarifa.'));
+          const message = getHttpErrorMessage(err, 'No fue posible crear la tarifa.');
+          this.error.set(message);
+          void this.alert.error('Error al crear tarifa', message);
         },
       });
   }

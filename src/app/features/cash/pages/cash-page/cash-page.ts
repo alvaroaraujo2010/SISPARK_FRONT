@@ -5,6 +5,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { Auth } from '../../../../core/services/auth';
 import { PaymentsService } from '../../../../core/services/payments';
+import { AlertService } from '../../../../core/services/alert';
 import { getHttpErrorMessage } from '../../../../core/http/problem-details';
 import { PageHeader } from '../../../../shared/components/page-header/page-header';
 import { EmptyState } from '../../../../shared/components/empty-state/empty-state';
@@ -28,6 +29,7 @@ export class CashPage {
   private readonly fb = inject(FormBuilder);
   private readonly paymentsService = inject(PaymentsService);
   private readonly auth = inject(Auth);
+  private readonly alert = inject(AlertService);
 
   protected readonly session = this.auth.session;
   protected readonly selectedDate = signal(new Date().toISOString().slice(0, 10));
@@ -110,7 +112,9 @@ export class CashPage {
     }
     const value = this.paymentForm.getRawValue();
     if (!value.registrationId && !value.monthlyId) {
-      this.error.set('Indique el id de registro o de mensualidad asociada al pago.');
+      const message = 'Indique el id de registro o de mensualidad asociada al pago.';
+      this.error.set(message);
+      void this.alert.info('Dato requerido', message);
       return;
     }
 
@@ -130,14 +134,18 @@ export class CashPage {
       .subscribe({
         next: () => {
           this.saving.set(false);
-          this.feedback.set('Pago registrado correctamente.');
+          const message = 'Pago registrado correctamente.';
+          this.feedback.set(message);
+          void this.alert.success('Pago registrado', message);
           this.paymentForm.reset({ methodId: 0, value: 0, reference: '', note: '', registrationId: null, monthlyId: null });
           this.closeoutResource.reload();
           this.paymentsResource.reload();
         },
         error: (err: HttpErrorResponse) => {
           this.saving.set(false);
-          this.error.set(getHttpErrorMessage(err, 'No fue posible registrar el pago.'));
+          const message = getHttpErrorMessage(err, 'No fue posible registrar el pago.');
+          this.error.set(message);
+          void this.alert.error('Error al registrar pago', message);
         },
       });
   }

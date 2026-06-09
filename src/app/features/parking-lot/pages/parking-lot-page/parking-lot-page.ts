@@ -5,6 +5,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { getHttpErrorMessage } from '../../../../core/http/problem-details';
 import { AdminService } from '../../../../core/services/admin';
 import { Auth } from '../../../../core/services/auth';
+import { AlertService } from '../../../../core/services/alert';
 
 @Component({
   selector: 'app-parking-lot-page',
@@ -16,6 +17,7 @@ export class ParkingLotPage {
   private readonly fb = inject(FormBuilder);
   private readonly adminService = inject(AdminService);
   private readonly auth = inject(Auth);
+  private readonly alert = inject(AlertService);
 
   protected readonly session = this.auth.session;
   protected readonly isSaving = signal(false);
@@ -73,12 +75,16 @@ export class ParkingLotPage {
     this.adminService.updateParkingLot(this.lotForm.getRawValue()).subscribe({
       next: () => {
         this.isSaving.set(false);
-        this.feedback.set('Datos del parqueadero guardados correctamente.');
+        const message = 'Datos del parqueadero guardados correctamente.';
+        this.feedback.set(message);
+        void this.alert.success('Parqueadero actualizado', message);
         this.lotResource.reload();
       },
       error: (err: HttpErrorResponse) => {
         this.isSaving.set(false);
-        this.error.set(getHttpErrorMessage(err, 'No fue posible guardar los datos del parqueadero.'));
+        const message = getHttpErrorMessage(err, 'No fue posible guardar los datos del parqueadero.');
+        this.error.set(message);
+        void this.alert.error('Error al guardar parqueadero', message);
       },
     });
   }

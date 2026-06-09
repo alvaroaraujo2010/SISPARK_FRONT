@@ -6,14 +6,16 @@ import type { EntryTicket, ExitTicket } from '../../../core/models/api.types';
 export type ParkingTicketMode = 'entry' | 'exit';
 
 const PRINT_STYLES = `
-  @page { size: 80mm auto; margin: 4mm; }
-  html, body { margin: 0; padding: 0; background: #fff; }
+  @page { size: 80mm 130mm; margin: 0; }
+  html, body { margin: 0; padding: 0; width: 80mm; min-height: 0; background: #fff; }
   body {
     font-family: 'Segoe UI', Tahoma, sans-serif;
     font-size: 12px;
     color: #111;
+    overflow: hidden;
   }
-  .entry-ticket { width: 72mm; padding: 2mm 3mm; box-sizing: border-box; }
+  .print-page { width: 80mm; margin: 0; padding: 0; }
+  .entry-ticket { width: 80mm; margin: 0; padding: 4mm 5mm 3mm; box-sizing: border-box; page-break-after: avoid; break-after: avoid; }
   .entry-ticket__header {
     text-align: center;
     border-bottom: 1px dashed #333;
@@ -106,7 +108,7 @@ export class ParkingTicketPrint {
 
     doc.open();
     doc.write(
-      `<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Tirilla SISPARK</title><style>${PRINT_STYLES}</style></head><body>${ticket.outerHTML}</body></html>`,
+      `<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Tirilla SISPARK</title><style>${PRINT_STYLES}</style></head><body><main class="print-page">${ticket.outerHTML}</main></body></html>`,
     );
     doc.close();
 

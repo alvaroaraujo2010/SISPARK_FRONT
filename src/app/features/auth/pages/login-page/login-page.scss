@@ -1,19 +1,32 @@
 .login-shell {
+  position: relative;
   min-height: 100vh;
   display: flex;
   align-items: center;
   padding: 2rem 1rem 3rem;
+  overflow: hidden;
   background:
-    radial-gradient(circle at top left, rgba(0, 204, 102, 0.2), transparent 24%),
-    radial-gradient(circle at bottom right, rgba(240, 174, 33, 0.12), transparent 22%),
-    linear-gradient(160deg, #0b1410 0%, #183023 36%, #eff8f1 36%, #f7faf8 100%);
+    radial-gradient(circle at 18% 10%, rgba(35, 242, 143, 0.22), transparent 30%),
+    radial-gradient(circle at 82% 18%, rgba(246, 195, 74, 0.18), transparent 28%),
+    linear-gradient(135deg, #050d12 0%, #071017 48%, #10271b 100%);
+  isolation: isolate;
+}
+
+.login-shell__backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(5, 13, 18, 0.82), rgba(5, 13, 18, 0.55)),
+    url('https://images.unsplash.com/photo-1506521781263-d8422e82f27a?w=1920&q=85') center/cover;
+  opacity: 0.72;
 }
 
 .login-shell__grid {
   width: min(1160px, 100%);
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 1.08fr 0.92fr;
+  grid-template-columns: 1.05fr 0.95fr;
   gap: 1.5rem;
   align-items: stretch;
 }
@@ -26,9 +39,11 @@
 
 .login-shell__spotlight {
   padding: 2.25rem;
-  background: linear-gradient(180deg, rgba(10, 23, 16, 0.96) 0%, rgba(18, 43, 30, 0.94) 100%);
+  background: linear-gradient(180deg, rgba(8, 19, 26, 0.82) 0%, rgba(8, 19, 26, 0.64) 100%);
   color: #fff;
-  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.24);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(22px);
 }
 
 .login-shell__eyebrow {
@@ -50,8 +65,8 @@
 }
 
 .login-shell__eyebrow-mark {
-  background: rgba(0, 204, 102, 0.18);
-  color: #85f0b7;
+  background: #23f28f;
+  color: #07140e;
 }
 
 .login-shell__eyebrow-chip {
@@ -60,9 +75,10 @@
 }
 
 .login-shell__spotlight h1 {
-  font-size: clamp(2.1rem, 4vw, 3.8rem);
-  font-weight: 800;
-  line-height: 1.05;
+  font-size: clamp(2.35rem, 4.6vw, 4.6rem);
+  font-weight: 900;
+  letter-spacing: -0.06em;
+  line-height: 0.98;
   margin-bottom: 1rem;
 }
 
@@ -86,8 +102,8 @@
   align-items: start;
   padding: 1rem;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .login-shell__benefits i {
@@ -110,7 +126,7 @@
   margin-top: 1.25rem;
   padding: 1rem 1.1rem;
   border-radius: 20px;
-  background: linear-gradient(135deg, rgba(0, 204, 102, 0.18), rgba(255, 255, 255, 0.04));
+  background: linear-gradient(135deg, rgba(35, 242, 143, 0.2), rgba(246, 195, 74, 0.09));
   border: 1px solid rgba(133, 240, 183, 0.16);
 }
 
@@ -131,10 +147,11 @@
 
 .login-shell__panel {
   width: 100%;
-  padding: 2rem;
-  border-radius: 26px;
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.18);
+  padding: clamp(1.5rem, 3vw, 2.35rem);
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.65);
 }
 
 .login-shell__brand {
@@ -161,8 +178,39 @@
 
 .login-shell__heading h2 {
   margin-bottom: 0.45rem;
-  font-size: 2rem;
-  font-weight: 800;
+  font-size: 2.25rem;
+  font-weight: 900;
+  letter-spacing: -0.045em;
+}
+
+.login-shell .form-control {
+  min-height: 3.1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(7, 16, 23, 0.1);
+  background: #f8fbf8;
+}
+
+.login-shell .form-control:focus {
+  border-color: #23f28f;
+  box-shadow: 0 0 0 0.24rem rgba(35, 242, 143, 0.16);
+}
+
+.btn-login-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 3.2rem;
+  border: 0;
+  border-radius: 999px;
+  color: #07140e;
+  background: linear-gradient(135deg, #23f28f, #f6c34a);
+  font-weight: 900;
+  box-shadow: 0 18px 38px rgba(35, 242, 143, 0.24);
+}
+
+.btn-login-submit:disabled {
+  opacity: 0.68;
 }
 
 .login-shell__heading p {
@@ -181,6 +229,11 @@
 .login-shell__links a {
   color: #0a7a44;
   font-weight: 600;
+}
+
+.login-shell__links span {
+  color: #6a7971;
+  font-size: 0.9rem;
 }
 
 @media (max-width: 960px) {

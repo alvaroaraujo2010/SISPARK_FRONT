@@ -24,6 +24,7 @@ import { roleLabel } from '../../../../core/auth/roles';
 import { ColombiaDatePipe } from '../../../../core/date/colombia-date.pipe';
 import { Auth } from '../../../../core/services/auth';
 import { Parking } from '../../../../core/services/parking';
+import { AlertService } from '../../../../core/services/alert';
 import { ChannelAssistant } from '../../../channel/components/channel-assistant/channel-assistant';
 import { KpiCard } from '../../../../shared/components/kpi-card/kpi-card';
 
@@ -75,6 +76,7 @@ export class HomePage {
   private readonly adminService = inject(AdminService);
   private readonly auth = inject(Auth);
   private readonly boardRefresh = inject(BoardRefresh);
+  private readonly alert = inject(AlertService);
 
   protected readonly session = this.auth.session;
   protected readonly roleLabel = roleLabel;
@@ -210,12 +212,15 @@ export class HomePage {
       next: (preview) => {
         this.isSubmittingMovement.set(false);
         this.movementPreview.set(preview);
+        if (!preview.requiresVehicleType || preview.hasOpenEntry) {
+          void this.confirmMovement();
+        }
       },
       error: (error: HttpErrorResponse) => {
         this.isSubmittingMovement.set(false);
-        this.movementError.set(
-          getHttpErrorMessage(error, 'No fue posible validar la placa.'),
-        );
+        const message = getHttpErrorMessage(error, 'No fue posible validar la placa.');
+        this.movementError.set(message);
+        void this.alert.error('Validación de placa', message);
       },
     });
   }
@@ -223,16 +228,34 @@ export class HomePage {
   protected selectVisitorVehicleType(option: VisitorVehicleTypeOption): void {
     this.selectedVehicleTypeId.set(option.id);
     this.movementError.set('');
+    void this.confirmMovement();
   }
 
-  protected confirmMovement(): void {
+  protected async confirmMovement(): Promise<void> {
     const preview = this.movementPreview();
     if (!preview) {
       return;
     }
 
     if (preview.requiresVehicleType && this.selectedVehicleTypeId() == null) {
-      this.movementError.set('Seleccione si el vehiculo es Moto o Carro antes de registrar el ingreso.');
+      const message = 'Seleccione si el vehiculo es Moto o Carro antes de registrar el ingreso.';
+      this.movementError.set(message);
+      await this.alert.info('Tipo de vehículo requerido', message);
+      return;
+    }
+
+    const confirmed = await this.alert.confirm({
+      title: preview.hasOpenEntry ? `Registrar salida de ${preview.plate}` : `Registrar ingreso de ${preview.plate}`,
+      text:
+        preview.hasOpenEntry && preview.estimatedAmountToPay != null
+          ? `Valor estimado ${formatCop(preview.estimatedAmountToPay)}`
+          : 'Confirme para continuar con el movimiento.',
+      confirmButtonText: preview.hasOpenEntry ? 'Registrar salida' : 'Registrar ingreso',
+      cancelButtonText: 'Cancelar',
+    });
+
+    if (!confirmed) {
+      this.cancelMovementFlow();
       return;
     }
 
@@ -308,7 +331,7 @@ export class HomePage {
         electronicInvoice,
       )
       .subscribe({
-      next: (response) => {
+      next: async (response) => {
         this.isSubmittingMovement.set(false);
         let msg = response.message;
         if (response.action === 'exit' && response.totalToPay != null) {
@@ -318,6 +341,7 @@ export class HomePage {
           msg = `${msg} · ${response.electronicInvoiceMessage}`;
         }
         this.movementMessage.set(msg);
+        await this.alert.success('Movimiento registrado', msg);
         this.plateForm.reset();
         this.movementPreview.set(null);
         this.selectedVehicleTypeId.set(null);
@@ -327,17 +351,40 @@ export class HomePage {
 
         if (response.action === 'entry' && response.entryTicket) {
           this.printPrompt.set({ mode: 'entry', entryTicket: response.entryTicket });
+          await this.askPrintTicket();
         } else if (response.action === 'exit' && response.exitTicket) {
           this.printPrompt.set({ mode: 'exit', exitTicket: response.exitTicket });
+          await this.askPrintTicket();
         }
       },
       error: (error: HttpErrorResponse) => {
         this.isSubmittingMovement.set(false);
-        this.movementError.set(
-          getHttpErrorMessage(error, 'No fue posible registrar el movimiento del vehiculo.'),
-        );
+        const message = getHttpErrorMessage(error, 'No fue posible registrar el movimiento del vehiculo.');
+        this.movementError.set(message);
+        void this.alert.error('Error de movimiento', message);
       },
       });
+  }
+
+  private async askPrintTicket(): Promise<void> {
+    const prompt = this.printPrompt();
+    if (!prompt) {
+      return;
+    }
+
+    const confirmed = await this.alert.confirm({
+      title: prompt.mode === 'entry' ? '¿Imprimir tirilla de ingreso?' : '¿Imprimir tirilla de salida?',
+      text: 'Puede imprimir el comprobante ahora.',
+      confirmButtonText: 'Sí, imprimir',
+      cancelButtonText: 'No, gracias',
+      icon: 'info',
+    });
+
+    if (confirmed) {
+      this.confirmPrint();
+    } else {
+      this.dismissPrint();
+    }
   }
 
   protected cancelMovementFlow(): void {

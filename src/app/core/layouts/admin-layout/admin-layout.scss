@@ -2,6 +2,10 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background:
+    radial-gradient(circle at 12% 4%, rgba(35, 242, 143, 0.16), transparent 28%),
+    radial-gradient(circle at 88% 10%, rgba(246, 195, 74, 0.13), transparent 24%),
+    linear-gradient(180deg, #071017 0%, #0d171f 18rem, #f5f7f3 18rem, #ffffff 100%);
 }
 
 .admin-layout__content {

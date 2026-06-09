@@ -4,12 +4,17 @@
       <span class="logo-tile logo-tile--public" aria-hidden="true">
         <img src="images/logo_moderno_de_sispark.png" alt="SisPark" decoding="async" />
       </span>
-      <span class="public-brand__text">SISPARK</span>
+      <span class="public-brand__copy">
+        <strong>SISPARK</strong>
+        <small>Smart Parking Control</small>
+      </span>
     </a>
 
     <nav class="public-nav" aria-label="Navegación principal">
       <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Inicio</a>
-      <a routerLink="/login" class="public-nav__cta btn btn-success">Acceder al panel</a>
+      <a href="#soluciones">Soluciones</a>
+      <a href="#operacion">Operación</a>
+      <a routerLink="/login" class="public-nav__cta">Acceder al panel</a>
     </nav>
 
     <button class="public-nav__toggle" type="button" (click)="toggleMobileNav()" [attr.aria-expanded]="mobileNavOpen()" aria-label="Abrir menú">
@@ -20,7 +25,9 @@
   @if (mobileNavOpen()) {
     <div class="public-nav__mobile" role="navigation" aria-label="Menú móvil">
       <a routerLink="/" (click)="closeMobileNav()">Inicio</a>
-      <a routerLink="/login" class="public-nav__cta btn btn-success" (click)="closeMobileNav()">Acceder al panel</a>
+      <a href="#soluciones" (click)="closeMobileNav()">Soluciones</a>
+      <a href="#operacion" (click)="closeMobileNav()">Operación</a>
+      <a routerLink="/login" class="public-nav__cta" (click)="closeMobileNav()">Acceder al panel</a>
     </div>
   }
 </header>
@@ -37,12 +44,14 @@
       </span>
       <div>
         <strong>SISPARK</strong>
-        <p>Sistema integral de gestión para parqueaderos.</p>
+        <p>Control operativo, caja, auditoría y reportes para parqueaderos modernos.</p>
       </div>
     </div>
 
     <nav class="public-footer__nav" aria-label="Enlaces de pie de página">
       <a routerLink="/">Inicio</a>
+      <a href="#soluciones">Soluciones</a>
+      <a href="#operacion">Operación</a>
       <a routerLink="/login">Acceso administrativo</a>
     </nav>
 

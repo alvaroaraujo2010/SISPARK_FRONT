@@ -4,6 +4,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { Auth } from '../../../../core/services/auth';
+import { AlertService } from '../../../../core/services/alert';
 import { MonthliesService, MonthlyStatusFilter } from '../../../../core/services/monthlies';
 import { AdminService } from '../../../../core/services/admin';
 import { getHttpErrorMessage } from '../../../../core/http/problem-details';
@@ -30,6 +31,7 @@ export class MonthliesPage {
   private readonly monthliesService = inject(MonthliesService);
   private readonly adminService = inject(AdminService);
   private readonly auth = inject(Auth);
+  private readonly alert = inject(AlertService);
 
   protected readonly session = this.auth.session;
   protected readonly searchTerm = signal('');
@@ -143,23 +145,34 @@ export class MonthliesPage {
       .subscribe({
         next: () => {
           this.saving.set(false);
-          this.feedback.set('Mensualidad renovada correctamente.');
+          const message = 'Mensualidad renovada correctamente.';
+          this.feedback.set(message);
+          void this.alert.success('Mensualidad renovada', message);
           this.monthliesResource.reload();
           this.clearSelection();
         },
         error: (err: HttpErrorResponse) => {
           this.saving.set(false);
-          this.error.set(getHttpErrorMessage(err, 'No fue posible renovar la mensualidad.'));
+          const message = getHttpErrorMessage(err, 'No fue posible renovar la mensualidad.');
+          this.error.set(message);
+          void this.alert.error('Error al renovar mensualidad', message);
         },
       });
   }
 
-  protected cancel(): void {
+  protected async cancel(): Promise<void> {
     const id = this.selectedId();
     if (id === null) {
       return;
     }
-    if (!confirm('Desea cancelar la mensualidad seleccionada?')) {
+    const confirmed = await this.alert.confirm({
+      title: 'Cancelar mensualidad',
+      text: '¿Desea cancelar la mensualidad seleccionada?',
+      confirmButtonText: 'Sí, cancelar',
+      cancelButtonText: 'No',
+      icon: 'warning',
+    });
+    if (!confirmed) {
       return;
     }
 
@@ -170,13 +183,17 @@ export class MonthliesPage {
     this.monthliesService.cancel(id).subscribe({
       next: () => {
         this.saving.set(false);
-        this.feedback.set('Mensualidad cancelada.');
+        const message = 'Mensualidad cancelada.';
+        this.feedback.set(message);
+        void this.alert.success('Mensualidad cancelada', message);
         this.monthliesResource.reload();
         this.clearSelection();
       },
       error: (err: HttpErrorResponse) => {
         this.saving.set(false);
-        this.error.set(getHttpErrorMessage(err, 'No fue posible cancelar la mensualidad.'));
+        const message = getHttpErrorMessage(err, 'No fue posible cancelar la mensualidad.');
+        this.error.set(message);
+        void this.alert.error('Error al cancelar mensualidad', message);
       },
     });
   }

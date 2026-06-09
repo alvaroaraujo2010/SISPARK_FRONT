@@ -6,6 +6,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { getHttpErrorMessage } from '../../../../core/http/problem-details';
 import { roleLabel } from '../../../../core/auth/roles';
 import { UsersService } from '../../../../core/services/users';
+import { AlertService } from '../../../../core/services/alert';
 import { Auth } from '../../../../core/services/auth';
 import { PageHeader } from '../../../../shared/components/page-header/page-header';
 import { EmptyState } from '../../../../shared/components/empty-state/empty-state';
@@ -21,6 +22,7 @@ export class UsersPage {
   private readonly fb = inject(FormBuilder);
   private readonly usersService = inject(UsersService);
   private readonly auth = inject(Auth);
+  private readonly alert = inject(AlertService);
 
   protected readonly session = this.auth.session;
   protected readonly roleLabel = roleLabel;
@@ -100,13 +102,17 @@ export class UsersPage {
       .subscribe({
         next: () => {
           this.isSaving.set(false);
-          this.feedback.set('Usuario creado correctamente.');
+          const message = 'Usuario creado correctamente.';
+          this.feedback.set(message);
+          void this.alert.success('Usuario creado', message);
           this.userForm.reset({ roleId: 0 });
           this.usersResource.reload();
         },
         error: (err: HttpErrorResponse) => {
           this.isSaving.set(false);
-          this.error.set(getHttpErrorMessage(err, 'No fue posible crear el usuario.'));
+          const message = getHttpErrorMessage(err, 'No fue posible crear el usuario.');
+          this.error.set(message);
+          void this.alert.error('Error al crear usuario', message);
         },
       });
   }
@@ -155,12 +161,16 @@ export class UsersPage {
       .subscribe({
         next: () => {
           this.isSaving.set(false);
-          this.feedback.set('Usuario actualizado.');
+          const message = 'Usuario actualizado.';
+          this.feedback.set(message);
+          void this.alert.success('Usuario actualizado', message);
           this.usersResource.reload();
         },
         error: (err: HttpErrorResponse) => {
           this.isSaving.set(false);
-          this.error.set(getHttpErrorMessage(err, 'No fue posible actualizar el usuario.'));
+          const message = getHttpErrorMessage(err, 'No fue posible actualizar el usuario.');
+          this.error.set(message);
+          void this.alert.error('Error al actualizar usuario', message);
         },
       });
   }
@@ -179,12 +189,16 @@ export class UsersPage {
     this.usersService.setActive(id, nextState).subscribe({
       next: () => {
         this.isSaving.set(false);
-        this.feedback.set(nextState ? 'Usuario activado.' : 'Usuario desactivado.');
+        const message = nextState ? 'Usuario activado.' : 'Usuario desactivado.';
+        this.feedback.set(message);
+        void this.alert.success('Estado actualizado', message);
         this.usersResource.reload();
       },
       error: (err: HttpErrorResponse) => {
         this.isSaving.set(false);
-        this.error.set(getHttpErrorMessage(err, 'No fue posible cambiar el estado del usuario.'));
+        const message = getHttpErrorMessage(err, 'No fue posible cambiar el estado del usuario.');
+        this.error.set(message);
+        void this.alert.error('Error al cambiar estado', message);
       },
     });
   }
@@ -205,7 +219,9 @@ export class UsersPage {
       return;
     }
     if (this.resetPassword().length < 6) {
-      this.error.set('La nueva contraseña debe tener al menos 6 caracteres.');
+      const message = 'La nueva contraseña debe tener al menos 6 caracteres.';
+      this.error.set(message);
+      void this.alert.info('Contraseña inválida', message);
       return;
     }
     this.isSaving.set(true);
@@ -215,13 +231,17 @@ export class UsersPage {
     this.usersService.resetPassword(id, { newPassword: this.resetPassword() }).subscribe({
       next: () => {
         this.isSaving.set(false);
-        this.feedback.set('Contraseña restablecida.');
+        const message = 'Contraseña restablecida.';
+        this.feedback.set(message);
+        void this.alert.success('Contraseña restablecida', message);
         this.resettingId.set(null);
         this.resetPassword.set('');
       },
       error: (err: HttpErrorResponse) => {
         this.isSaving.set(false);
-        this.error.set(getHttpErrorMessage(err, 'No fue posible restablecer la contraseña.'));
+        const message = getHttpErrorMessage(err, 'No fue posible restablecer la contraseña.');
+        this.error.set(message);
+        void this.alert.error('Error al restablecer contraseña', message);
       },
     });
   }

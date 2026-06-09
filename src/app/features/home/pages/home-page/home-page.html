@@ -3,8 +3,9 @@
     <article class="operation-card operation-card--plate">
       <div class="operation-card__header">
         <div>
-          <span class="section-kicker">Acción rápida</span>
+          <span class="section-kicker">Consola operativa</span>
           <h2>Ingreso y salida por placa</h2>
+          <p class="operation-card__subtitle">Despacho rápido para registrar movimientos del parqueadero en tiempo real.</p>
         </div>
         <div class="plate-header__session" aria-label="Sesión activa">
           <span class="session-oval__label">Sesion activa</span>
@@ -13,118 +14,124 @@
         </div>
       </div>
 
-      <p class="operation-card__copy">
-        Ingrese la placa para ingreso o salida. Si el vehiculo no esta registrado, debe indicar si es
-        <strong>Moto</strong> o <strong>Carro</strong> antes del ingreso (tarifa moto: $2.000 por hora o fraccion).
-        Para clientes con mensualidad o datos completos, el administrador puede registrar el vehiculo en
-        <a routerLink="/admin/vehiculos">Vehiculos</a>.
-      </p>
+      <div class="dispatch-grid">
+        <div class="dispatch-main">
+          <form class="plate-form" [formGroup]="plateForm" (ngSubmit)="submitPlate()">
+            <label class="plate-form__label" for="plate-input">
+              <i class="bi bi-upc-scan"></i>
+              Placa del vehículo
+            </label>
+            <div class="plate-input-shell">
+              <input
+                id="plate-input"
+                class="form-control text-center text-uppercase"
+                formControlName="plate"
+                maxlength="15"
+                placeholder="ABC123"
+                autocomplete="off"
+                inputmode="text"
+                [attr.aria-invalid]="plateForm.controls.plate.invalid && plateForm.controls.plate.touched"
+              />
+            </div>
 
-      <form class="plate-form" [formGroup]="plateForm" (ngSubmit)="submitPlate()">
-        <label class="form-label visually-hidden" for="plate-input">Placa del vehículo</label>
-        <input
-          id="plate-input"
-          class="form-control text-center text-uppercase"
-          formControlName="plate"
-          maxlength="15"
-          placeholder="ABC123"
-          autocomplete="off"
-          inputmode="text"
-          [attr.aria-invalid]="plateForm.controls.plate.invalid && plateForm.controls.plate.touched"
-        />
+            @if (movementPreview(); as preview) {
+              @if (preview.requiresVehicleType && isIngresoPending()) {
+                <div class="visitor-type-picker mt-3" role="group" aria-label="Tipo de vehiculo para ingreso">
+                  <p class="visitor-type-picker__label">
+                    Ingreso de {{ preview.plate }}: indique si es <strong>Moto</strong> o <strong>Carro</strong>
+                    (tarifa moto $2.000 / fracción).
+                  </p>
+                  <div class="visitor-type-picker__actions">
+                    @for (option of preview.visitorVehicleTypes; track option.id) {
+                      <button
+                        class="btn"
+                        type="button"
+                        [class.btn-success]="selectedVehicleTypeId() === option.id"
+                        [class.btn-outline-dark]="selectedVehicleTypeId() !== option.id"
+                        (click)="selectVisitorVehicleType(option)"
+                      >
+                        {{ option.name }}
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
 
-        @if (movementError()) {
-          <div class="status-banner status-banner--danger" role="alert">
-            <i class="bi bi-x-circle-fill"></i>
-            <span>{{ movementError() }}</span>
-          </div>
-        }
+            }
 
-        @if (movementMessage()) {
-          <div class="status-banner status-banner--success" role="alert">
-            <i class="bi bi-check-circle-fill"></i>
-            <span>{{ movementMessage() }}</span>
-          </div>
-        }
-
-        @if (movementPreview(); as preview) {
-          @if (preview.requiresVehicleType && isIngresoPending()) {
-            <div class="visitor-type-picker mt-3" role="group" aria-label="Tipo de vehiculo para ingreso">
-              <p class="visitor-type-picker__label">
-                Ingreso de {{ preview.plate }}: indique si es <strong>Moto</strong> o <strong>Carro</strong>
-                (tarifa moto $2.000 / fracción).
-              </p>
-              <div class="visitor-type-picker__actions">
-                @for (option of preview.visitorVehicleTypes; track option.id) {
-                  <button
-                    class="btn"
-                    type="button"
-                    [class.btn-success]="selectedVehicleTypeId() === option.id"
-                    [class.btn-outline-dark]="selectedVehicleTypeId() !== option.id"
-                    (click)="selectVisitorVehicleType(option)"
-                  >
-                    {{ option.name }}
-                  </button>
-                }
+            @if (printPrompt()) {
+              <div class="ticket-print-host" aria-hidden="true">
+                <app-parking-ticket-print
+                  [mode]="printPrompt()!.mode"
+                  [entryTicket]="printPrompt()!.entryTicket ?? null"
+                  [exitTicket]="printPrompt()!.exitTicket ?? null"
+                />
               </div>
-            </div>
-          }
+            }
 
-          @if (canConfirmMovement()) {
-            <div class="movement-confirm mt-3">
-              <p class="movement-confirm__label">{{ pendingActionLabel() }}</p>
-              <div class="movement-confirm__actions">
-                <button
-                  class="btn btn-success btn-sm"
-                  type="button"
-                  [disabled]="isSubmittingMovement()"
-                  (click)="confirmMovement()"
-                >
-                  {{ isSubmittingMovement() ? 'Procesando...' : 'Confirmar' }}
-                </button>
-                <button
-                  class="btn btn-outline-dark btn-sm"
-                  type="button"
-                  [disabled]="isSubmittingMovement()"
-                  (click)="cancelMovementFlow()"
-                >
-                  Cancelar
-                </button>
-              </div>
+            <div class="plate-form__actions">
+              <button class="btn btn-success plate-submit" type="submit" [disabled]="isSubmittingMovement() || movementPreview()">
+                <i class="bi bi-lightning-charge-fill"></i>
+                {{ isSubmittingMovement() ? 'Procesando...' : 'Validar placa' }}
+              </button>
             </div>
-          }
-        }
+          </form>
 
-        @if (printPrompt()) {
-          <div class="print-prompt mt-3" role="dialog" aria-labelledby="print-prompt-title">
-            <p id="print-prompt-title" class="print-prompt__title">
-              {{
-                printPrompt()!.mode === 'entry'
-                  ? '¿Desea imprimir la tirilla de ingreso?'
-                  : '¿Desea imprimir la tirilla de salida?'
-              }}
-            </p>
-            <div class="print-prompt__actions">
-              <button class="btn btn-success btn-sm" type="button" (click)="confirmPrint()">Sí, imprimir</button>
-              <button class="btn btn-outline-dark btn-sm" type="button" (click)="dismissPrint()">No, gracias</button>
-            </div>
+          <div class="dispatch-status-row dispatch-status-row--bottom" aria-label="Resumen operativo">
+            <article>
+              <span>Activos</span>
+              <strong>{{ dashboardResource.isLoading() ? '...' : (dashboardResource.value()?.activeVehicles ?? 0) }}</strong>
+            </article>
+            <article>
+              <span>Cupos</span>
+              <strong>{{ dashboardResource.isLoading() ? '...' : (dashboardResource.value()?.availableSpots ?? 0) }}</strong>
+            </article>
+            <article>
+              <span>Día</span>
+              <strong>{{ dashboardResource.isLoading() ? '...' : ((dashboardResource.value()?.dailyRevenue ?? 0) | currency: 'COP' : 'symbol' : '1.0-0') }}</strong>
+            </article>
           </div>
-
-          <div class="ticket-print-host" aria-hidden="true">
-            <app-parking-ticket-print
-              [mode]="printPrompt()!.mode"
-              [entryTicket]="printPrompt()!.entryTicket ?? null"
-              [exitTicket]="printPrompt()!.exitTicket ?? null"
-            />
-          </div>
-        }
-
-        <div class="plate-form__actions">
-          <button class="btn btn-success" type="submit" [disabled]="isSubmittingMovement() || movementPreview()">
-            {{ isSubmittingMovement() ? 'Procesando...' : 'Validar placa' }}
-          </button>
         </div>
-      </form>
+
+        <aside class="dispatch-aside" aria-label="Guía de operación">
+          <div class="dispatch-aside__header">
+            <i class="bi bi-command"></i>
+            <div>
+              <strong>Flujo de turno</strong>
+              <span>Operación guiada</span>
+            </div>
+          </div>
+
+          <ol class="dispatch-steps">
+            <li>
+              <span>01</span>
+              <div>
+                <strong>Digite la placa</strong>
+                <small>El sistema detecta ingreso o salida.</small>
+              </div>
+            </li>
+            <li>
+              <span>02</span>
+              <div>
+                <strong>Confirme el movimiento</strong>
+                <small>Seleccione tipo si es visitante nuevo.</small>
+              </div>
+            </li>
+            <li>
+              <span>03</span>
+              <div>
+                <strong>Imprima tirilla</strong>
+                <small>Entrada o salida según corresponda.</small>
+              </div>
+            </li>
+          </ol>
+
+          <p class="operation-card__copy dispatch-note">
+            Para clientes con mensualidad o datos completos, registre el vehículo desde
+            <a routerLink="/admin/vehiculos">Vehículos</a>.
+          </p>
+        </aside>
+      </div>
     </article>
   </div>
 </section>
@@ -151,7 +158,7 @@
       </div>
     </div>
 
-    <div class="table-card">
+    <div class="table-card table-card--operations">
       @if (loadError()) {
         <div class="status-banner status-banner--danger table-card__status" role="alert">
           <i class="bi bi-exclamation-octagon-fill"></i>
@@ -159,7 +166,8 @@
         </div>
       }
 
-      <table class="table align-middle mb-0">
+      <div class="operation-table-scroll">
+      <table class="table align-middle mb-0 operation-table">
         <thead>
           <tr>
             <th>Placa</th>
@@ -246,6 +254,7 @@
           }
         </tbody>
       </table>
+      </div>
     </div>
   </div>
 </section>

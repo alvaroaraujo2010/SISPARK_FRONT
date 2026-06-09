@@ -4,6 +4,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { ClientsService } from '../../../../core/services/clients';
+import { AlertService } from '../../../../core/services/alert';
 import { Auth } from '../../../../core/services/auth';
 import { getHttpErrorMessage } from '../../../../core/http/problem-details';
 import { PageHeader } from '../../../../shared/components/page-header/page-header';
@@ -20,6 +21,7 @@ export class ClientsPage {
   private readonly fb = inject(FormBuilder);
   private readonly clientsService = inject(ClientsService);
   private readonly auth = inject(Auth);
+  private readonly alert = inject(AlertService);
 
   protected readonly session = this.auth.session;
   protected readonly searchTerm = signal('');
@@ -111,12 +113,16 @@ export class ClientsPage {
       .subscribe({
         next: () => {
           this.saving.set(false);
-          this.feedback.set('Cliente actualizado correctamente.');
+          const message = 'Cliente actualizado correctamente.';
+          this.feedback.set(message);
+          void this.alert.success('Cliente actualizado', message);
           this.clientsResource.reload();
         },
         error: (err: HttpErrorResponse) => {
           this.saving.set(false);
-          this.error.set(getHttpErrorMessage(err, 'No fue posible actualizar el cliente.'));
+          const message = getHttpErrorMessage(err, 'No fue posible actualizar el cliente.');
+          this.error.set(message);
+          void this.alert.error('Error al actualizar cliente', message);
         },
       });
   }
