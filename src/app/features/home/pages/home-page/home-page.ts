@@ -125,6 +125,7 @@ export class HomePage {
   protected readonly selectedVehicleTypeId = signal<number | null>(null);
   protected readonly invoiceForm = this.fb.nonNullable.group({
     wantsElectronicInvoice: [false],
+    lostTicket: [false],
     documentType: ['CC' as ElectronicInvoiceRequest['documentType'], [Validators.required]],
     documentNumber: ['', [Validators.required, Validators.maxLength(30)]],
     customerName: ['', [Validators.required, Validators.maxLength(200)]],
@@ -270,6 +271,7 @@ export class HomePage {
   private openExitBillingDialog(preview: ParkingMovementPreview): void {
     this.invoiceForm.reset({
       wantsElectronicInvoice: false,
+      lostTicket: false,
       documentType: 'CC',
       documentNumber: '',
       customerName: '',
@@ -293,6 +295,7 @@ export class HomePage {
     }
 
     const wantsInvoice = this.invoiceForm.controls.wantsElectronicInvoice.value;
+    const lostTicket = this.invoiceForm.controls.lostTicket.value;
     if (wantsInvoice && this.invoiceForm.invalid) {
       this.invoiceForm.markAllAsTouched();
       return;
@@ -309,13 +312,14 @@ export class HomePage {
       : undefined;
 
     this.exitBillingDialog.set(null);
-    this.submitMovement(preview, wantsInvoice, invoicePayload);
+    this.submitMovement(preview, wantsInvoice, invoicePayload, lostTicket);
   }
 
   private submitMovement(
     preview: ParkingMovementPreview,
     wantsElectronicInvoice = false,
     electronicInvoice?: ElectronicInvoiceRequest,
+    lostTicket = false,
   ): void {
 
     this.isSubmittingMovement.set(true);
@@ -329,6 +333,7 @@ export class HomePage {
         this.selectedVehicleTypeId() ?? undefined,
         wantsElectronicInvoice,
         electronicInvoice,
+        lostTicket,
       )
       .subscribe({
       next: async (response) => {

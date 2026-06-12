@@ -386,6 +386,10 @@
           <input id="wants-invoice" class="form-check-input" type="checkbox" formControlName="wantsElectronicInvoice" />
           <label class="form-check-label" for="wants-invoice">Sí, solicitar facturación electrónica</label>
         </div>
+        <div class="form-check mb-3">
+          <input id="lost-ticket" class="form-check-input" type="checkbox" formControlName="lostTicket" />
+          <label class="form-check-label" for="lost-ticket">Aplicar recargo por ticket perdido</label>
+        </div>
 
         @if (invoiceForm.controls.wantsElectronicInvoice.value) {
           <div class="row g-2 mb-3">

@@ -54,6 +54,12 @@ export class RatesPage {
     vehicleTypeId: [0, [Validators.required, Validators.min(1)]],
     value: [0, [Validators.required, Validators.min(0.01)]],
     fractionMinutes: [60, [Validators.min(1)]],
+    freeToleranceMinutes: [0, [Validators.min(0)]],
+    fullDayValue: [0, [Validators.min(0)]],
+    nightStartTime: [''],
+    nightEndTime: [''],
+    nightValue: [0, [Validators.min(0)]],
+    lostTicketSurcharge: [0, [Validators.min(0)]],
     makeActive: [true],
   });
 
@@ -93,6 +99,12 @@ export class RatesPage {
         vehicleTypeId: value.vehicleTypeId,
         value: value.value,
         fractionMinutes: value.fractionMinutes ?? undefined,
+        freeToleranceMinutes: this.optionalNumber(value.freeToleranceMinutes),
+        fullDayValue: this.optionalNumber(value.fullDayValue),
+        nightStartTime: value.nightStartTime || undefined,
+        nightEndTime: value.nightEndTime || undefined,
+        nightValue: this.optionalNumber(value.nightValue),
+        lostTicketSurcharge: this.optionalNumber(value.lostTicketSurcharge),
         makeActive: value.makeActive,
       })
       .subscribe({
@@ -101,7 +113,19 @@ export class RatesPage {
           const message = 'Tarifa creada correctamente.';
           this.feedback.set(message);
           void this.alert.success('Tarifa creada', message);
-          this.rateForm.reset({ serviceTypeId: 1, vehicleTypeId: 0, value: 0, fractionMinutes: 60, makeActive: true });
+          this.rateForm.reset({
+            serviceTypeId: 1,
+            vehicleTypeId: 0,
+            value: 0,
+            fractionMinutes: 60,
+            freeToleranceMinutes: 0,
+            fullDayValue: 0,
+            nightStartTime: '',
+            nightEndTime: '',
+            nightValue: 0,
+            lostTicketSurcharge: 0,
+            makeActive: true,
+          });
           this.ratesResource.reload();
         },
         error: (err: HttpErrorResponse) => {
@@ -111,5 +135,9 @@ export class RatesPage {
           void this.alert.error('Error al crear tarifa', message);
         },
       });
+  }
+
+  private optionalNumber(value: number | null | undefined): number | undefined {
+    return value && value > 0 ? value : undefined;
   }
 }

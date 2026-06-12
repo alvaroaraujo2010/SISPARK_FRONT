@@ -35,6 +35,7 @@ export class Auth {
       tap((response) => {
         const sessionData: SessionData = {
           ...response,
+          permissions: response.permissions ?? [],
           userId: this.extractUserIdFromToken(response.token),
         };
 
@@ -72,6 +73,7 @@ export class Auth {
 
     try {
       const session = JSON.parse(rawSession) as SessionData;
+      session.permissions = session.permissions ?? [];
 
       if (this.isSessionExpired(session)) {
         localStorage.removeItem(this.storageKey);

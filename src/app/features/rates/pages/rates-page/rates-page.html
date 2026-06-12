@@ -68,6 +68,57 @@
                 formControlName="fractionMinutes"
               />
             </div>
+            <div class="col-md-6">
+              <label class="form-label" for="rate-tolerance">Tolerancia gratis (min)</label>
+              <input
+                id="rate-tolerance"
+                class="form-control"
+                type="number"
+                min="0"
+                formControlName="freeToleranceMinutes"
+              />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="rate-full-day">Dia completo (COP)</label>
+              <input
+                id="rate-full-day"
+                class="form-control"
+                type="number"
+                min="0"
+                step="100"
+                formControlName="fullDayValue"
+              />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="rate-night-start">Inicio nocturna</label>
+              <input id="rate-night-start" class="form-control" type="time" formControlName="nightStartTime" />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="rate-night-end">Fin nocturna</label>
+              <input id="rate-night-end" class="form-control" type="time" formControlName="nightEndTime" />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="rate-night-value">Valor nocturno</label>
+              <input
+                id="rate-night-value"
+                class="form-control"
+                type="number"
+                min="0"
+                step="100"
+                formControlName="nightValue"
+              />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="rate-lost-ticket">Recargo ticket perdido</label>
+              <input
+                id="rate-lost-ticket"
+                class="form-control"
+                type="number"
+                min="0"
+                step="100"
+                formControlName="lostTicketSurcharge"
+              />
+            </div>
             <div class="col-12">
               <label class="form-check form-switch">
                 <input
@@ -125,6 +176,7 @@
                   <th>Tipo vehiculo</th>
                   <th>Valor</th>
                   <th>Fraccion</th>
+                  <th>Reglas</th>
                   <th>Vigencia</th>
                   <th>Estado</th>
                 </tr>
@@ -150,6 +202,25 @@
                       } @else {
                         <span class="text-muted">—</span>
                       }
+                    </td>
+                    <td>
+                      <div class="rates-card__rules">
+                        @if (rate.toleranciaMinutos) {
+                          <span>{{ rate.toleranciaMinutos }} min gratis</span>
+                        }
+                        @if (rate.valorDiaCompleto) {
+                          <span>Día {{ rate.valorDiaCompleto | currency: 'COP' : 'symbol' : '1.0-0' : 'es-CO' }}</span>
+                        }
+                        @if (rate.valorNocturno) {
+                          <span>Nocturna {{ rate.horaInicioNocturna }}-{{ rate.horaFinNocturna }} · {{ rate.valorNocturno | currency: 'COP' : 'symbol' : '1.0-0' : 'es-CO' }}</span>
+                        }
+                        @if (rate.recargoTicketPerdido) {
+                          <span>Ticket perdido {{ rate.recargoTicketPerdido | currency: 'COP' : 'symbol' : '1.0-0' : 'es-CO' }}</span>
+                        }
+                        @if (!rate.toleranciaMinutos && !rate.valorDiaCompleto && !rate.valorNocturno && !rate.recargoTicketPerdido) {
+                          <span class="text-muted">—</span>
+                        }
+                      </div>
                     </td>
                     <td>
                       <span class="rates-card__dates">

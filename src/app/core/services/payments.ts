@@ -4,7 +4,10 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import type {
   CashCloseout,
+  CashShift,
+  CloseCashShiftPayload,
   CreatePaymentPayload,
+  OpenCashShiftPayload,
   Payment,
   PaymentMethod,
 } from '../models/api.types';
@@ -31,6 +34,18 @@ export class PaymentsService {
 
   cashCloseout(date: string): Observable<CashCloseout> {
     return this.http.get<CashCloseout>(`${this.apiUrl}/cash-closeout`, { params: { date } });
+  }
+
+  openShift(): Observable<CashShift | null> {
+    return this.http.get<CashShift | null>(`${this.apiUrl}/shift/open`);
+  }
+
+  startShift(payload: OpenCashShiftPayload): Observable<CashShift> {
+    return this.http.post<CashShift>(`${this.apiUrl}/shift/open`, payload);
+  }
+
+  closeShift(payload: CloseCashShiftPayload): Observable<CashShift> {
+    return this.http.post<CashShift>(`${this.apiUrl}/shift/close`, payload);
   }
 
   create(payload: CreatePaymentPayload): Observable<Payment> {

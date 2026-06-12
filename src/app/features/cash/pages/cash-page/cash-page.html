@@ -12,6 +12,78 @@
       <div class="status-banner status-banner--danger" role="alert">{{ loadError() }}</div>
     }
 
+    <article class="cash-card cash-card--shift">
+      <div class="cash-card__header">
+        <div>
+          <span class="section-kicker">Turno de caja</span>
+          <h2>{{ openShiftResource.value() ? 'Turno activo' : 'Abrir turno' }}</h2>
+          <p class="text-muted mb-0">Controla la base inicial, recaudo del sistema, efectivo real y diferencias.</p>
+        </div>
+        @if (openShiftResource.value(); as shift) {
+          <span class="status-chip status-chip--active">Turno #{{ shift.id }}</span>
+        } @else {
+          <span class="status-chip status-chip--registered">Sin turno abierto</span>
+        }
+      </div>
+
+      @if (openShiftResource.value(); as shift) {
+        <div class="shift-grid">
+          <article>
+            <span>Base inicial</span>
+            <strong>{{ shift.baseInicial | currency: 'COP' : 'symbol' : '1.0-0' : 'es-CO' }}</strong>
+          </article>
+          <article>
+            <span>Recaudo turno</span>
+            <strong>{{ shift.totalSistema | currency: 'COP' : 'symbol' : '1.0-0' : 'es-CO' }}</strong>
+          </article>
+          <article>
+            <span>Esperado en caja</span>
+            <strong>{{ shiftTotalExpected() | currency: 'COP' : 'symbol' : '1.0-0' : 'es-CO' }}</strong>
+          </article>
+          <article>
+            <span>Apertura</span>
+            <strong>{{ shift.fechaApertura | date: 'short' }}</strong>
+          </article>
+        </div>
+
+        <form class="shift-close-form" [formGroup]="closeShiftForm" (ngSubmit)="closeShift()">
+          <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+              <label class="form-label" for="shift-real-cash">Efectivo real</label>
+              <input id="shift-real-cash" class="form-control" type="number" min="0" step="100" formControlName="efectivoReal" />
+            </div>
+            <div class="col-md-5">
+              <label class="form-label" for="shift-close-note">Observación de cierre</label>
+              <input id="shift-close-note" class="form-control" formControlName="observacion" maxlength="255" />
+            </div>
+            <div class="col-md-3">
+              <button class="btn btn-outline-dark w-100" type="submit" [disabled]="saving() || closeShiftForm.invalid">
+                {{ saving() ? 'Cerrando...' : 'Cerrar turno' }}
+              </button>
+            </div>
+          </div>
+        </form>
+      } @else {
+        <form [formGroup]="openShiftForm" (ngSubmit)="openShift()">
+          <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+              <label class="form-label" for="shift-base">Base inicial</label>
+              <input id="shift-base" class="form-control" type="number" min="0" step="100" formControlName="baseInicial" />
+            </div>
+            <div class="col-md-5">
+              <label class="form-label" for="shift-open-note">Observación de apertura</label>
+              <input id="shift-open-note" class="form-control" formControlName="observacion" maxlength="255" />
+            </div>
+            <div class="col-md-3">
+              <button class="btn btn-success w-100" type="submit" [disabled]="saving() || openShiftForm.invalid">
+                {{ saving() ? 'Abriendo...' : 'Abrir turno' }}
+              </button>
+            </div>
+          </div>
+        </form>
+      }
+    </article>
+
     <div class="cash-page__kpis">
       <app-kpi-card
         label="Recaudado hoy"
@@ -163,7 +235,7 @@
             <button
               class="btn btn-success"
               type="submit"
-              [disabled]="saving() || paymentForm.invalid"
+              [disabled]="saving() || paymentForm.invalid || !openShiftResource.value()"
             >
               {{ saving() ? 'Registrando...' : 'Registrar pago' }}
             </button>

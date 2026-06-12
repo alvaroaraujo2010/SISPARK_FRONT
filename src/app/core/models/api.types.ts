@@ -6,6 +6,7 @@ export type LoginResponse = {
   fullName: string;
   username: string;
   role: string;
+  permissions: string[];
 };
 
 export type DashboardSummary = {
@@ -158,6 +159,35 @@ export type RoleOption = {
   description: string;
 };
 
+export type Permission = {
+  id: number;
+  code: string;
+  module: string;
+  action: string;
+  description: string;
+};
+
+export type RolePermission = {
+  id: number;
+  name: string;
+  description: string;
+  isActive: boolean;
+  permissions: string[];
+};
+
+export type CreateRolePayload = {
+  name: string;
+  description: string;
+  isActive: boolean;
+  permissions: string[];
+};
+
+export type UpdateRolePayload = {
+  name: string;
+  description: string;
+  isActive: boolean;
+};
+
 export type UserAccount = {
   id: number;
   firstName: string;
@@ -271,6 +301,12 @@ export type Rate = {
   tipoVehiculo: string;
   valor: number;
   fraccionMinutos: number | null;
+  toleranciaMinutos: number | null;
+  valorDiaCompleto: number | null;
+  horaInicioNocturna: string | null;
+  horaFinNocturna: string | null;
+  valorNocturno: number | null;
+  recargoTicketPerdido: number | null;
   fechaInicioVigencia: string;
   fechaFinVigencia: string | null;
   isActive: boolean;
@@ -282,6 +318,12 @@ export type CreateRatePayload = {
   vehicleTypeId: number;
   value: number;
   fractionMinutes?: number;
+  freeToleranceMinutes?: number;
+  fullDayValue?: number;
+  nightStartTime?: string;
+  nightEndTime?: string;
+  nightValue?: number;
+  lostTicketSurcharge?: number;
   startDate?: string;
   makeActive: boolean;
 };
@@ -292,6 +334,12 @@ export type UpdateRatePayload = {
   vehicleTypeId: number;
   value: number;
   fractionMinutes?: number;
+  freeToleranceMinutes?: number;
+  fullDayValue?: number;
+  nightStartTime?: string;
+  nightEndTime?: string;
+  nightValue?: number;
+  lostTicketSurcharge?: number;
   endDate?: string;
   isActive: boolean;
 };
@@ -352,6 +400,7 @@ export type Payment = {
   fechaPago: string;
   idRegistro: number | null;
   idMensualidad: number | null;
+  idTurno: number | null;
   idMetodoPago: number;
   metodoPago: string;
   idUsuario: number;
@@ -391,6 +440,31 @@ export type CashCloseout = {
   ingresosRegistros: number;
   porMetodo: CashByMethod[];
   porOperador: CashByOperator[];
+};
+
+export type CashShift = {
+  id: number;
+  idUsuario: number;
+  operador: string;
+  fechaApertura: string;
+  fechaCierre: string | null;
+  baseInicial: number;
+  totalSistema: number;
+  efectivoReal: number | null;
+  diferencia: number | null;
+  observacionApertura: string;
+  observacionCierre: string;
+  isOpen: boolean;
+};
+
+export type OpenCashShiftPayload = {
+  baseInicial: number;
+  observacion?: string;
+};
+
+export type CloseCashShiftPayload = {
+  efectivoReal: number;
+  observacion?: string;
 };
 
 export type IncomeReport = {

@@ -10,7 +10,7 @@ import { getHttpErrorMessage } from '../../../../core/http/problem-details';
 import { PageHeader } from '../../../../shared/components/page-header/page-header';
 import { EmptyState } from '../../../../shared/components/empty-state/empty-state';
 import { KpiCard } from '../../../../shared/components/kpi-card/kpi-card';
-import type { CashCloseout, Payment, PaymentMethod } from '../../../../core/models/api.types';
+import type { CashCloseout, CashShift, Payment, PaymentMethod } from '../../../../core/models/api.types';
 
 @Component({
   selector: 'app-cash-page',
@@ -80,6 +80,27 @@ export class CashPage {
     monthlyId: [null as number | null],
   });
 
+  protected readonly openShiftForm = this.fb.nonNullable.group({
+    baseInicial: [0, [Validators.required, Validators.min(0)]],
+    observacion: [''],
+  });
+
+  protected readonly closeShiftForm = this.fb.nonNullable.group({
+    efectivoReal: [0, [Validators.required, Validators.min(0)]],
+    observacion: [''],
+  });
+
+  protected readonly openShiftResource = rxResource<CashShift | null, number>({
+    params: () => 0,
+    stream: () => this.paymentsService.openShift(),
+    defaultValue: null,
+  });
+
+  protected readonly shiftTotalExpected = computed(() => {
+    const shift = this.openShiftResource.value();
+    return shift ? shift.baseInicial + shift.totalSistema : 0;
+  });
+
   protected readonly loadError = () => {
     if (this.closeoutResource.status() === 'error') {
       return getHttpErrorMessage(this.closeoutResource.error(), 'No fue posible cargar el cierre de caja.');
@@ -105,9 +126,66 @@ export class CashPage {
     this.searchTo.set(value);
   }
 
+  protected openShift(): void {
+    if (this.openShiftForm.invalid) {
+      this.openShiftForm.markAllAsTouched();
+      return;
+    }
+
+    const value = this.openShiftForm.getRawValue();
+    this.saving.set(true);
+    this.paymentsService.startShift({
+      baseInicial: value.baseInicial,
+      observacion: value.observacion.trim() || undefined,
+    }).subscribe({
+      next: () => {
+        this.saving.set(false);
+        this.openShiftForm.reset({ baseInicial: 0, observacion: '' });
+        this.openShiftResource.reload();
+        void this.alert.success('Turno abierto', 'Ya puedes registrar pagos en caja.');
+      },
+      error: (err: HttpErrorResponse) => {
+        this.saving.set(false);
+        void this.alert.error('Error al abrir turno', getHttpErrorMessage(err, 'No fue posible abrir el turno.'));
+      },
+    });
+  }
+
+  protected closeShift(): void {
+    if (this.closeShiftForm.invalid) {
+      this.closeShiftForm.markAllAsTouched();
+      return;
+    }
+
+    const value = this.closeShiftForm.getRawValue();
+    this.saving.set(true);
+    this.paymentsService.closeShift({
+      efectivoReal: value.efectivoReal,
+      observacion: value.observacion.trim() || undefined,
+    }).subscribe({
+      next: (shift) => {
+        this.saving.set(false);
+        this.closeShiftForm.reset({ efectivoReal: 0, observacion: '' });
+        this.openShiftResource.reload();
+        this.closeoutResource.reload();
+        this.paymentsResource.reload();
+        const diff = shift.diferencia ?? 0;
+        void this.alert.success('Turno cerrado', `Diferencia: ${diff.toLocaleString('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 })}`);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.saving.set(false);
+        void this.alert.error('Error al cerrar turno', getHttpErrorMessage(err, 'No fue posible cerrar el turno.'));
+      },
+    });
+  }
+
   protected submit(): void {
     if (this.paymentForm.invalid) {
       this.paymentForm.markAllAsTouched();
+      return;
+    }
+    if (!this.openShiftResource.value()) {
+      void this.alert.info('Turno requerido', 'Debes abrir un turno de caja antes de registrar pagos.');
       return;
     }
     const value = this.paymentForm.getRawValue();
@@ -140,6 +218,7 @@ export class CashPage {
           this.paymentForm.reset({ methodId: 0, value: 0, reference: '', note: '', registrationId: null, monthlyId: null });
           this.closeoutResource.reload();
           this.paymentsResource.reload();
+          this.openShiftResource.reload();
         },
         error: (err: HttpErrorResponse) => {
           this.saving.set(false);

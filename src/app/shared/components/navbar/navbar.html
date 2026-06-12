@@ -44,10 +44,16 @@
         <section class="nav-group" aria-label="Operacion">
           <span class="nav-group__label">Operacion</span>
           <div class="nav-group__links">
-            @if (showOperations()) {
+            @if (can(permissions.parkingOperate)) {
               <a routerLink="/admin/inicio" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-speedometer2" aria-hidden="true"></i>Inicio</a>
+            }
+            @if (can(permissions.vehiclesManage)) {
               <a routerLink="/admin/vehiculos" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-car-front" aria-hidden="true"></i>Vehiculos</a>
+            }
+            @if (can(permissions.clientsManage)) {
               <a routerLink="/admin/clientes" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-people" aria-hidden="true"></i>Clientes</a>
+            }
+            @if (can(permissions.monthliesManage)) {
               <a routerLink="/admin/mensualidades" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-calendar2-week" aria-hidden="true"></i>Mensualidades</a>
             }
             @if (showCashMenu()) {
@@ -61,9 +67,18 @@
         <section class="nav-group" aria-label="Administracion">
           <span class="nav-group__label">Administracion</span>
           <div class="nav-group__links">
-            <a routerLink="/admin/tarifas" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-tags" aria-hidden="true"></i>Tarifas</a>
-            <a routerLink="/admin/parqueadero" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-p-square" aria-hidden="true"></i>Parqueadero</a>
-            <a routerLink="/admin/usuarios" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-person-gear" aria-hidden="true"></i>Usuarios</a>
+            @if (can(permissions.ratesManage)) {
+              <a routerLink="/admin/tarifas" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-tags" aria-hidden="true"></i>Tarifas</a>
+            }
+            @if (can(permissions.parkingLotManage)) {
+              <a routerLink="/admin/parqueadero" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-p-square" aria-hidden="true"></i>Parqueadero</a>
+            }
+            @if (can(permissions.usersManage)) {
+              <a routerLink="/admin/usuarios" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-person-gear" aria-hidden="true"></i>Usuarios</a>
+            }
+            @if (can(permissions.rolesManage)) {
+              <a routerLink="/admin/roles" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-shield-lock" aria-hidden="true"></i>Roles</a>
+            }
           </div>
         </section>
       }
@@ -72,8 +87,12 @@
         <section class="nav-group" aria-label="Supervision">
           <span class="nav-group__label">Supervision</span>
           <div class="nav-group__links">
-            <a routerLink="/admin/reportes" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-graph-up-arrow" aria-hidden="true"></i>Reportes</a>
-            <a routerLink="/admin/auditoria" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-shield-check" aria-hidden="true"></i>Auditoria</a>
+            @if (can(permissions.reportsView)) {
+              <a routerLink="/admin/reportes" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-graph-up-arrow" aria-hidden="true"></i>Reportes</a>
+            }
+            @if (can(permissions.auditView)) {
+              <a routerLink="/admin/auditoria" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-shield-check" aria-hidden="true"></i>Auditoria</a>
+            }
           </div>
         </section>
       }

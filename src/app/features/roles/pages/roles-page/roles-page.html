@@ -1,0 +1,95 @@
+<app-page-header
+  kicker="Seguridad"
+  title="Roles y permisos"
+  description="Crea roles personalizados y define exactamente qué módulos puede ver o administrar cada usuario."
+  [sessionName]="session()?.fullName ?? ''"
+  [sessionRole]="session()?.role ?? ''"
+/>
+
+<section class="roles-layout">
+  <article class="roles-card roles-card--list">
+    <div class="roles-card__header">
+      <div>
+        <span class="section-kicker">Roles</span>
+        <h2>Perfiles disponibles</h2>
+      </div>
+      <button class="btn btn-success btn-sm" type="button" (click)="newRole()">
+        <i class="bi bi-plus-lg"></i> Nuevo
+      </button>
+    </div>
+
+    <div class="role-list">
+      @for (role of rolesResource.value(); track role.id) {
+        <button
+          class="role-item"
+          type="button"
+          [class.role-item--active]="selectedRoleId() === role.id"
+          (click)="selectRole(role)"
+        >
+          <span>
+            <strong>{{ role.name }}</strong>
+            <small>{{ role.description || 'Sin descripcion' }}</small>
+          </span>
+          <em [class.role-item__status--off]="!role.isActive">{{ role.isActive ? 'Activo' : 'Inactivo' }}</em>
+        </button>
+      }
+    </div>
+  </article>
+
+  <article class="roles-card roles-card--editor">
+    <div class="roles-card__header">
+      <div>
+        <span class="section-kicker">Configuración</span>
+        <h2>{{ selectedRole() ? 'Editar rol' : 'Nuevo rol' }}</h2>
+      </div>
+    </div>
+
+    <form [formGroup]="roleForm" (ngSubmit)="saveRole()">
+      <div class="row g-3">
+        <div class="col-md-5">
+          <label class="form-label" for="role-name">Nombre</label>
+          <input id="role-name" class="form-control" formControlName="name" maxlength="50" />
+        </div>
+        <div class="col-md-5">
+          <label class="form-label" for="role-description">Descripción</label>
+          <input id="role-description" class="form-control" formControlName="description" maxlength="150" />
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <label class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" role="switch" formControlName="isActive" />
+            <span class="form-check-label">Activo</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="permissions-matrix">
+        @for (group of groupedPermissions(); track group.module) {
+          <section class="permission-group">
+            <h3>{{ group.module }}</h3>
+            <div class="permission-group__grid">
+              @for (permission of group.permissions; track permission.code) {
+                <label class="permission-check">
+                  <input
+                    type="checkbox"
+                    [checked]="hasPermission(permission.code)"
+                    (change)="togglePermission(permission.code, $any($event.target).checked)"
+                  />
+                  <span>
+                    <strong>{{ permission.action }}</strong>
+                    <small>{{ permission.description }}</small>
+                  </span>
+                </label>
+              }
+            </div>
+          </section>
+        }
+      </div>
+
+      <div class="roles-card__actions">
+        <button class="btn btn-success" type="submit" [disabled]="saving() || roleForm.invalid">
+          {{ saving() ? 'Guardando...' : 'Guardar rol y permisos' }}
+        </button>
+      </div>
+    </form>
+  </article>
+</section>

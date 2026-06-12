@@ -35,4 +35,24 @@ export class ReportsService {
     const params = new HttpParams().set('daysAhead', daysAhead.toString());
     return this.http.get<DueSoonReport>(`${this.apiUrl}/monthlies-due`, { params });
   }
+
+  exportIncome(from: string, to: string): Observable<Blob> {
+    const params = new HttpParams().set('from', from).set('to', to);
+    return this.http.get(`${this.apiUrl}/export/income.csv`, { params, responseType: 'blob' });
+  }
+
+  exportOccupancy(from: string, to: string): Observable<Blob> {
+    const params = new HttpParams().set('from', from).set('to', to);
+    return this.http.get(`${this.apiUrl}/export/occupancy.csv`, { params, responseType: 'blob' });
+  }
+
+  exportOperators(from: string, to: string): Observable<Blob> {
+    const params = new HttpParams().set('from', from).set('to', to);
+    return this.http.get(`${this.apiUrl}/export/operators.csv`, { params, responseType: 'blob' });
+  }
+
+  exportMonthliesDue(daysAhead: number): Observable<Blob> {
+    const params = new HttpParams().set('daysAhead', daysAhead.toString());
+    return this.http.get(`${this.apiUrl}/export/monthlies-due.csv`, { params, responseType: 'blob' });
+  }
 }

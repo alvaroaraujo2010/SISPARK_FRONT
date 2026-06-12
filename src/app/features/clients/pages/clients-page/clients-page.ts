@@ -68,6 +68,10 @@ export class ClientsPage {
     this.includeInactive.set(value);
   }
 
+  protected clearSearch(): void {
+    this.searchTerm.set('');
+  }
+
   protected selectClient(id: number): void {
     const client = this.clientsResource.value().find((item) => item.id === id);
     if (!client) {

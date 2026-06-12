@@ -33,6 +33,20 @@
           (change)="setTo($any($event.target).value)"
         />
       </div>
+      <div class="reports-page__exports">
+        <button class="btn btn-outline-dark btn-sm" type="button" (click)="exportIncome()">
+          <i class="bi bi-download"></i> Ingresos CSV
+        </button>
+        <button class="btn btn-outline-dark btn-sm" type="button" (click)="exportOccupancy()">
+          <i class="bi bi-download"></i> Ocupación CSV
+        </button>
+        <button class="btn btn-outline-dark btn-sm" type="button" (click)="exportOperators()">
+          <i class="bi bi-download"></i> Operadores CSV
+        </button>
+        <button class="btn btn-outline-dark btn-sm" type="button" (click)="exportMonthliesDue()">
+          <i class="bi bi-download"></i> Mensualidades CSV
+        </button>
+      </div>
     </div>
 
     <div class="reports-page__kpis">
@@ -68,7 +82,10 @@
 
     <div class="reports-page__grid">
       <article class="reports-card">
-        <h2>Ingresos diarios</h2>
+        <header class="reports-card__header">
+          <h2>Ingresos diarios</h2>
+          <button class="btn btn-outline-dark btn-sm" type="button" (click)="exportIncome()">CSV</button>
+        </header>
         @if (incomeResource.value().serie.length === 0) {
           <app-empty-state
             icon="bi-graph-up"
@@ -102,7 +119,10 @@
       </article>
 
       <article class="reports-card">
-        <h2>Operadores</h2>
+        <header class="reports-card__header">
+          <h2>Operadores</h2>
+          <button class="btn btn-outline-dark btn-sm" type="button" (click)="exportOperators()">CSV</button>
+        </header>
         @if (operatorsResource.value().operadores.length === 0) {
           <app-empty-state
             icon="bi-person-badge"
@@ -141,7 +161,10 @@
     </div>
 
     <article class="reports-card reports-card--wide">
-      <h2>Mensualidades por vencer (proximos 14 dias)</h2>
+      <header class="reports-card__header">
+        <h2>Mensualidades por vencer (proximos 14 dias)</h2>
+        <button class="btn btn-outline-dark btn-sm" type="button" (click)="exportMonthliesDue()">CSV</button>
+      </header>
       @if (monthliesDueResource.value().items.length === 0) {
         <app-empty-state
           icon="bi-calendar2-week"

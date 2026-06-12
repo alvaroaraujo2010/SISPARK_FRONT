@@ -1,15 +1,7 @@
 .rates-page__grid {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
-}
-
-@media (min-width: 1100px) {
-  .rates-page__grid {
-    grid-template-columns: 1fr 1.3fr;
-  }
-  .rates-card--wide {
-    grid-column: span 1;
-  }
 }
 
 .rates-card {
@@ -56,4 +48,13 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+.rates-card__rules {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 12rem;
+  font-size: 0.82rem;
+  color: var(--sp-muted);
 }

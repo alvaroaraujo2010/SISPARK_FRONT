@@ -4,9 +4,11 @@ import { Auth } from '../../../core/services/auth';
 import {
   canOperateParking,
   canSupervise,
-  defaultAdminRoute,
+  defaultAdminRouteByAccess,
+  hasPermission,
   isAdministrator,
   isCashier,
+  PermissionCodes,
   roleLabel,
 } from '../../../core/auth/roles';
 
@@ -24,16 +26,35 @@ export class Navbar {
   protected readonly isAuthenticated = computed(() => this.auth.isAuthenticated());
   protected readonly mobileMenuOpen = signal(false);
   protected readonly roleLabel = roleLabel;
+  protected readonly can = (permission: string) =>
+    isAdministrator(this.session()?.role) || hasPermission(this.session()?.permissions, permission);
+  protected readonly permissions = PermissionCodes;
 
   protected readonly showOperations = computed(() =>
-    canOperateParking(this.session()?.role),
+    canOperateParking(this.session()?.role)
+    || this.can(PermissionCodes.parkingOperate)
+    || this.can(PermissionCodes.vehiclesManage)
+    || this.can(PermissionCodes.clientsManage)
+    || this.can(PermissionCodes.monthliesManage),
   );
-  protected readonly showAdminMenu = computed(() => isAdministrator(this.session()?.role));
+  protected readonly showAdminMenu = computed(() =>
+    isAdministrator(this.session()?.role)
+    || this.can(PermissionCodes.ratesManage)
+    || this.can(PermissionCodes.parkingLotManage)
+    || this.can(PermissionCodes.usersManage)
+    || this.can(PermissionCodes.rolesManage),
+  );
   protected readonly showCashMenu = computed(() =>
-    isAdministrator(this.session()?.role) || isCashier(this.session()?.role),
+    isAdministrator(this.session()?.role) || isCashier(this.session()?.role) || this.can(PermissionCodes.cashManage),
   );
-  protected readonly showReports = computed(() => canSupervise(this.session()?.role));
-  protected readonly homeLink = computed(() => defaultAdminRoute(this.session()?.role));
+  protected readonly showReports = computed(() =>
+    canSupervise(this.session()?.role)
+    || this.can(PermissionCodes.reportsView)
+    || this.can(PermissionCodes.auditView),
+  );
+  protected readonly homeLink = computed(() =>
+    defaultAdminRouteByAccess(this.session()?.role, this.session()?.permissions),
+  );
 
   protected toggleMobileMenu(): void {
     this.mobileMenuOpen.update((open) => !open);

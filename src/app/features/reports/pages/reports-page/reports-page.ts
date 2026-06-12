@@ -5,6 +5,7 @@ import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { Auth } from '../../../../core/services/auth';
 import { ReportsService } from '../../../../core/services/reports';
+import { AlertService } from '../../../../core/services/alert';
 import { getHttpErrorMessage } from '../../../../core/http/problem-details';
 import { PageHeader } from '../../../../shared/components/page-header/page-header';
 import { EmptyState } from '../../../../shared/components/empty-state/empty-state';
@@ -34,6 +35,7 @@ export class ReportsPage {
   private readonly fb = inject(FormBuilder);
   private readonly reportsService = inject(ReportsService);
   private readonly auth = inject(Auth);
+  private readonly alert = inject(AlertService);
 
   protected readonly session = this.auth.session;
   protected readonly from = signal(this.daysAgoIso(30));
@@ -115,6 +117,47 @@ export class ReportsPage {
 
   protected setTo(value: string): void {
     this.to.set(value);
+  }
+
+  protected exportIncome(): void {
+    this.download(
+      this.reportsService.exportIncome(this.from(), this.to()),
+      `ingresos-${this.from()}-${this.to()}.csv`,
+    );
+  }
+
+  protected exportOccupancy(): void {
+    this.download(
+      this.reportsService.exportOccupancy(this.from(), this.to()),
+      `ocupacion-${this.from()}-${this.to()}.csv`,
+    );
+  }
+
+  protected exportOperators(): void {
+    this.download(
+      this.reportsService.exportOperators(this.from(), this.to()),
+      `operadores-${this.from()}-${this.to()}.csv`,
+    );
+  }
+
+  protected exportMonthliesDue(): void {
+    this.download(this.reportsService.exportMonthliesDue(14), 'mensualidades-por-vencer.csv');
+  }
+
+  private download(request: ReturnType<ReportsService['exportIncome']>, fileName: string): void {
+    request.subscribe({
+      next: (blob) => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        link.click();
+        URL.revokeObjectURL(url);
+      },
+      error: (error: HttpErrorResponse) => {
+        void this.alert.error('Exportación fallida', getHttpErrorMessage(error, 'No fue posible exportar el reporte.'));
+      },
+    });
   }
 
   private daysAgoIso(days: number): string {

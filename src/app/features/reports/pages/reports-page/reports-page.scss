@@ -11,6 +11,13 @@
   margin-bottom: 1.5rem;
 }
 
+.reports-page__exports {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-left: auto;
+}
+
 .reports-page__kpis {
   display: grid;
   gap: 1rem;
@@ -40,9 +47,28 @@
 
 .reports-card h2 {
   font-size: 1.1rem;
+  margin: 0 0 0.6rem;
+}
+
+.reports-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
   margin-bottom: 0.6rem;
+}
+
+.reports-card__header h2 {
+  margin: 0;
 }
 
 .reports-card--wide {
   margin-top: 0;
+}
+
+@media (max-width: 760px) {
+  .reports-page__exports {
+    width: 100%;
+    margin-left: 0;
+  }
 }

@@ -67,12 +67,14 @@ export class Parking {
     vehicleTypeId?: number,
     wantsElectronicInvoice = false,
     electronicInvoice?: ElectronicInvoiceRequest,
+    lostTicket = false,
   ): Observable<ParkingMovementResult> {
     return this.http.post<ParkingMovementResult>(`${this.apiUrl}/entry-exit`, {
       plate,
       vehicleTypeId: vehicleTypeId ?? null,
       wantsElectronicInvoice,
       electronicInvoice: wantsElectronicInvoice ? electronicInvoice : null,
+      lostTicket,
     });
   }
 
