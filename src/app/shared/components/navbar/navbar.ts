@@ -42,7 +42,8 @@ export class Navbar {
     || this.can(PermissionCodes.ratesManage)
     || this.can(PermissionCodes.parkingLotManage)
     || this.can(PermissionCodes.usersManage)
-    || this.can(PermissionCodes.rolesManage),
+    || this.can(PermissionCodes.rolesManage)
+    || this.can(PermissionCodes.tenantsManage),
   );
   protected readonly showCashMenu = computed(() =>
     isAdministrator(this.session()?.role) || isCashier(this.session()?.role) || this.can(PermissionCodes.cashManage),

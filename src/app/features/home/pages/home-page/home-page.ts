@@ -27,6 +27,7 @@ import { Parking } from '../../../../core/services/parking';
 import { AlertService } from '../../../../core/services/alert';
 import { ChannelAssistant } from '../../../channel/components/channel-assistant/channel-assistant';
 import { KpiCard } from '../../../../shared/components/kpi-card/kpi-card';
+import { DashboardCharts } from '../../../../shared/components/dashboard-charts/dashboard-charts';
 
 type PrintPrompt = {
   mode: ParkingTicketMode;
@@ -66,6 +67,7 @@ function formatCop(amount: number): string {
     ChannelAssistant,
     ParkingTicketPrint,
     KpiCard,
+    DashboardCharts,
   ],
   templateUrl: './home-page.html',
   styleUrl: './home-page.scss',

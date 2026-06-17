@@ -6,6 +6,9 @@ export type LoginResponse = {
   fullName: string;
   username: string;
   role: string;
+  tenantId: number;
+  tenantName: string;
+  tenantSlug: string;
   permissions: string[];
 };
 
@@ -194,6 +197,8 @@ export type UserAccount = {
   lastName: string;
   username: string;
   email: string | null;
+  tenantId: number;
+  tenantName: string;
   roleId: number;
   roleName: string;
   isActive: boolean;
@@ -558,4 +563,41 @@ export type UpdateUserPayload = {
 
 export type ResetPasswordPayload = {
   newPassword: string;
+};
+
+export type TenantResponse = {
+  id: number;
+  nombre: string;
+  slug: string;
+  activo: boolean;
+  fechaCreacion: string;
+};
+
+export type CreateTenantRequest = {
+  nombre: string;
+  slug: string;
+  adminUsername: string;
+  adminPassword: string;
+  adminEmail: string;
+};
+
+export type DailyRevenuePoint = {
+  date: string;
+  revenue: number;
+};
+
+export type ServiceTypeRevenue = {
+  serviceType: string;
+  total: number;
+};
+
+export type VehicleTypeCount = {
+  vehicleType: string;
+  count: number;
+};
+
+export type DashboardChartData = {
+  last7DaysRevenue: DailyRevenuePoint[];
+  revenueByServiceType: ServiceTypeRevenue[];
+  activeVehicleTypeDistribution: VehicleTypeCount[];
 };

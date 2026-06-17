@@ -1,0 +1,54 @@
+<section class="charts-section">
+  <div class="container-shell">
+    <div class="section-heading">
+      <span class="section-kicker">Analítica</span>
+      <h2>Panel de gráficos</h2>
+      <p>Visualiza el comportamiento del parqueadero en los últimos 7 días.</p>
+    </div>
+
+    @if (chartsResource.isLoading()) {
+      <p class="text-muted">Cargando datos...</p>
+    } @else {
+      <div class="charts-grid">
+        <article class="chart-card">
+          <div class="chart-card__header">
+            <i class="bi bi-graph-up"></i>
+            <div>
+              <strong>Ingresos últimos 7 días</strong>
+              <small>Evolución diaria de los cobros por salidas</small>
+            </div>
+          </div>
+          <div class="chart-card__body">
+            <canvas #lineCanvas></canvas>
+          </div>
+        </article>
+
+        <article class="chart-card">
+          <div class="chart-card__header">
+            <i class="bi bi-pie-chart"></i>
+            <div>
+              <strong>Ingresos por tipo de servicio</strong>
+              <small>Distribución del día de hoy</small>
+            </div>
+          </div>
+          <div class="chart-card__body chart-card__body--doughnut">
+            <canvas #doughnutCanvas></canvas>
+          </div>
+        </article>
+
+        <article class="chart-card">
+          <div class="chart-card__header">
+            <i class="bi bi-bar-chart"></i>
+            <div>
+              <strong>Vehículos activos por tipo</strong>
+              <small>Distribución actual dentro del parqueadero</small>
+            </div>
+          </div>
+          <div class="chart-card__body">
+            <canvas #barCanvas></canvas>
+          </div>
+        </article>
+      </div>
+    }
+  </div>
+</section>

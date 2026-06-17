@@ -19,6 +19,7 @@ import { CashPage } from './features/cash/pages/cash-page/cash-page';
 import { ProfilePage } from './features/profile/pages/profile-page/profile-page';
 import { AuditPage } from './features/audit/pages/audit-page/audit-page';
 import { RolesPage } from './features/roles/pages/roles-page/roles-page';
+import { TenantsPage } from './features/tenants/pages/tenants-page/tenants-page';
 
 const canOperate = permissionGuard([PermissionCodes.parkingOperate]);
 const canManageVehicles = permissionGuard([PermissionCodes.vehiclesManage]);
@@ -31,6 +32,7 @@ const canManageUsers = permissionGuard([PermissionCodes.usersManage]);
 const canManageRoles = permissionGuard([PermissionCodes.rolesManage]);
 const canViewReports = permissionGuard([PermissionCodes.reportsView]);
 const canViewAudit = permissionGuard([PermissionCodes.auditView]);
+const canManageTenants = permissionGuard([PermissionCodes.tenantsManage]);
 
 export const routes: Routes = [
   {
@@ -130,6 +132,12 @@ export const routes: Routes = [
         path: 'perfil',
         component: ProfilePage,
         title: 'Mi perfil | SISPARK',
+      },
+      {
+        path: 'tenants',
+        component: TenantsPage,
+        title: 'Empresas | SISPARK',
+        canActivate: [canManageTenants],
       },
     ],
   },

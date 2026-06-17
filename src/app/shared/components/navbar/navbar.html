@@ -79,6 +79,9 @@
             @if (can(permissions.rolesManage)) {
               <a routerLink="/admin/roles" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-shield-lock" aria-hidden="true"></i>Roles</a>
             }
+            @if (can(permissions.tenantsManage)) {
+              <a routerLink="/admin/tenants" routerLinkActive="active" (click)="closeMobileMenu()"><i class="bi bi-building" aria-hidden="true"></i>Empresas</a>
+            }
           </div>
         </section>
       }

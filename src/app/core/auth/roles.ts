@@ -21,6 +21,7 @@ export const PermissionCodes = {
   rolesManage: 'roles.manage',
   reportsView: 'reports.view',
   auditView: 'audit.view',
+  tenantsManage: 'tenants.manage',
 } as const;
 
 export function hasPermission(

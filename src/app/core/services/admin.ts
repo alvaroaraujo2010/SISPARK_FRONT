@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import type {
   DashboardSummary,
+  DashboardChartData,
   ParkingLot,
   UpdateParkingLotPayload,
   VehicleRegistrationPayload,
@@ -22,6 +23,10 @@ export class AdminService {
 
   getDashboardSummary(): Observable<DashboardSummary> {
     return this.http.get<DashboardSummary>(`${this.apiUrl}/dashboard-summary`);
+  }
+
+  getDashboardChartData(): Observable<DashboardChartData> {
+    return this.http.get<DashboardChartData>(`${this.apiUrl}/dashboard-charts`);
   }
 
   getVehicleTypes(): Observable<VehicleType[]> {

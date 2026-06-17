@@ -1,0 +1,94 @@
+<section class="tenants-page">
+  <div class="container-shell">
+    <app-page-header
+      kicker="Superadministrador"
+      title="Empresas (Tenants)"
+      description="Administre las empresas o parqueaderos independientes registrados en la plataforma. Al crear una empresa se genera automaticamente un parqueadero por defecto y un usuario administrador."
+      [sessionName]="session()?.fullName ?? null"
+      [sessionRole]="session()?.role ?? null"
+    />
+
+    @if (error()) {
+      <div class="status-banner status-banner--danger mb-3" role="alert">{{ error() }}</div>
+    }
+    @if (feedback()) {
+      <div class="status-banner status-banner--success mb-3" role="status">{{ feedback() }}</div>
+    }
+
+    <article class="tenants-card">
+      <h2>Nueva empresa</h2>
+      <form [formGroup]="tenantForm" (ngSubmit)="submit()">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label" for="t-nombre">Nombre de la empresa</label>
+            <input id="t-nombre" class="form-control" formControlName="nombre" maxlength="100" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="t-slug">Identificador (slug)</label>
+            <input id="t-slug" class="form-control text-lowercase" formControlName="slug" maxlength="50" placeholder="ej: mi-empresa" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="t-admin-user">Usuario administrador</label>
+            <input id="t-admin-user" class="form-control text-lowercase" formControlName="adminUsername" maxlength="50" autocomplete="off" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="t-admin-pass">Contraseña</label>
+            <input id="t-admin-pass" class="form-control" type="password" formControlName="adminPassword" minlength="6" autocomplete="new-password" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="t-admin-email">Correo (opcional)</label>
+            <input id="t-admin-email" class="form-control" type="email" formControlName="adminEmail" />
+          </div>
+        </div>
+
+        <div class="tenants-card__actions">
+          <button class="btn btn-success" type="submit" [disabled]="isSaving() || tenantForm.invalid">
+            {{ isSaving() ? 'Creando...' : 'Crear empresa' }}
+          </button>
+        </div>
+      </form>
+    </article>
+
+    <article class="tenants-card">
+      <h2>Empresas registradas</h2>
+      @if (tenantsResource.isLoading()) {
+        <p class="text-muted">Cargando...</p>
+      } @else if (tenantsResource.value().length === 0) {
+        <app-empty-state
+          icon="bi-building"
+          title="Aun no hay empresas"
+          description="Cree la primera con el formulario de arriba."
+        />
+      } @else {
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Slug</th>
+                <th>Estado</th>
+                <th>Creado</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (tenant of tenantsResource.value(); track tenant.id) {
+                <tr>
+                  <td><strong>{{ tenant.nombre }}</strong></td>
+                  <td><code>{{ tenant.slug }}</code></td>
+                  <td>
+                    @if (tenant.activo) {
+                      <span class="badge text-bg-success">Activo</span>
+                    } @else {
+                      <span class="badge text-bg-secondary">Inactivo</span>
+                    }
+                  </td>
+                  <td>{{ tenant.fechaCreacion | date: 'short' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </article>
+  </div>
+</section>
